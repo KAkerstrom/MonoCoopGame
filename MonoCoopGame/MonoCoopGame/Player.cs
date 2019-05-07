@@ -32,37 +32,7 @@ namespace monoCoopGame
         {
             sprite.Update();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex);
-            xPrevious = x;
-            yPrevious = y;
-            x += gamePadState.ThumbSticks.Left.X * moveSpeed;
-            y -= gamePadState.ThumbSticks.Left.Y * moveSpeed;
-
-
-            if (x > xPrevious)
-            {
-                if (gameState.Map.GetTileAtPoint((int)x + Tile.TILE_SIZE, (int)yPrevious).IsSolid
-                    || gameState.Map.GetTileAtPoint((int)x + Tile.TILE_SIZE, (int)yPrevious + Tile.TILE_SIZE).IsSolid)
-                    x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
-            }
-            else if (x < xPrevious)
-            {
-                if (gameState.Map.GetTileAtPoint((int)x, (int)yPrevious).IsSolid
-                    || gameState.Map.GetTileAtPoint((int)x, (int)yPrevious + Tile.TILE_SIZE).IsSolid)
-                    x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
-            }
-
-            if (y > yPrevious)
-            {
-                if (gameState.Map.GetTileAtPoint((int)xPrevious, (int)y + Tile.TILE_SIZE).IsSolid
-                    || gameState.Map.GetTileAtPoint((int)xPrevious + Tile.TILE_SIZE, (int)y + Tile.TILE_SIZE).IsSolid)
-                    y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
-            }
-            else if (y < yPrevious)
-            {
-                if (gameState.Map.GetTileAtPoint((int)xPrevious, (int)y).IsSolid
-                    || gameState.Map.GetTileAtPoint((int)xPrevious + Tile.TILE_SIZE, (int)y).IsSolid)
-                    y = (yPrevious / Tile.TILE_SIZE) *Tile.TILE_SIZE;
-            }
+            Move(gameState, gamePadState.ThumbSticks.Left.X * moveSpeed, -gamePadState.ThumbSticks.Left.Y * moveSpeed);
         }
     }
 }

@@ -12,6 +12,7 @@ namespace monoCoopGame
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         GameState gameState;
+        Camera camera;
 
         public Game1()
         {
@@ -28,7 +29,7 @@ namespace monoCoopGame
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            graphics.ToggleFullScreen();
+            //graphics.ToggleFullScreen();
             base.Initialize();
         }
 
@@ -47,6 +48,7 @@ namespace monoCoopGame
             TileMap map = new TileMap(50, 50);
             Player testPlayer = new Player(250, 250, 1);
             gameState = new GameState(map, new System.Collections.Generic.List<Character> { testPlayer });
+            camera = new Camera(GraphicsDevice.Viewport, (int)testPlayer.x, (int)testPlayer.y);
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace monoCoopGame
             foreach (Character c in gameState.Characters)
                 c.Step(gameState);
 
-            // TODO: Add your update logic here
+            camera.SetCenter((int)gameState.Characters[0].x, (int)gameState.Characters[0].y);
 
             base.Update(gameTime);
         }
@@ -84,7 +86,7 @@ namespace monoCoopGame
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, camera.Transform);
             gameState.Map.Draw(spriteBatch);
             foreach (Character character in gameState.Characters)
                 character.Draw(spriteBatch);
