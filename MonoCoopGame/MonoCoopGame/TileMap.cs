@@ -34,7 +34,7 @@ namespace monoCoopGame
                         int xPara = Math.Abs(i - Map.GetUpperBound(0) / 2);
                         int yPara = Math.Abs(j - Map.GetUpperBound(1) / 2);
                         if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 10 && Utility.R.Next(30) > 0)
-                            Map[i, j] = new Tile(Tile.TileType.Grass);
+                            Map[i, j] = new Tile(Utility.R.Next(2) == 0 ? Tile.TileType.Stone : Tile.TileType.Dirt);
                         else
                             Map[i, j] = new Tile(Tile.TileType.Water);
                     }
@@ -67,15 +67,15 @@ namespace monoCoopGame
             if (!PointIsInMap(gridX, gridY))
                 return;
 
-            if (Map[gridX, gridY].Type == Tile.TileType.Grass)
+            if (Map[gridX, gridY].Type == Tile.TileType.Stone)
             {
-                Adjacency adj = GetAdjacency(gridX, gridY, Tile.TileType.Grass);
+                Adjacency adj = GetAdjacency(gridX, gridY, Tile.TileType.Stone);
                 Adjacency dirtAdj = GetAdjacency(gridX, gridY, Tile.TileType.Dirt);
                 adj.N |= dirtAdj.N;
                 adj.W |= dirtAdj.W;
                 adj.E |= dirtAdj.E;
                 adj.S |= dirtAdj.S;
-                Map[gridX, gridY].Sprite = new Sprite(GetTileTexture(Tile.TileType.Grass, adj));
+                Map[gridX, gridY].Sprite = new Sprite(GetTileTexture(Tile.TileType.Stone, adj));
             }
             else if (Map[gridX, gridY].Type == Tile.TileType.Dirt)
             {
@@ -116,15 +116,8 @@ namespace monoCoopGame
 
         public static Texture2D GetTileTexture(Tile.TileType tileType, Adjacency adj)
         {
-            Dictionary<Tile.TileType, string> typeStrings = new Dictionary<Tile.TileType, string>
-                {
-                    { Tile.TileType.Dirt, "stone_" },
-                    { Tile.TileType.Grass, "stone_" },
-                    { Tile.TileType.Water, "water_" },
-                    { Tile.TileType.None, "stone_" }
-                };
             StringBuilder texture = new StringBuilder(15);
-            texture.Append(typeStrings[tileType]);
+            texture.Append(tileType.ToString().ToLower() + "_");
 
             if (!adj.N)
                 texture.Append("n");

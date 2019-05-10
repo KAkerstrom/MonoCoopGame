@@ -17,6 +17,7 @@ namespace monoCoopGame
 
         public TileType Type { get; }
         public Sprite Sprite { get; set; }
+        public Sprite BgSprite { get; set; }
         public float SpeedModifier { get; set; } = 1;
         public bool IsSolid { get { return SpeedModifier == 0; } }
 
@@ -31,6 +32,9 @@ namespace monoCoopGame
             {
                 case TileType.Water:
                     SetProperties("water", 0.4f);
+                    break;
+                case TileType.Dirt:
+                    SetProperties("dirt", 1.3f);
                     break;
                 case TileType.Stone:
                     SetProperties("stone", 1f);
