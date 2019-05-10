@@ -12,6 +12,7 @@ namespace monoCoopGame
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         GameState gameState;
+        PlayerManager playerManager;
         Camera camera;
 
         public Game1()
@@ -46,9 +47,16 @@ namespace monoCoopGame
             Sprite.LoadSprites(this.Content, "img");
 
             TileMap map = new TileMap(50, 50);
-            Player testPlayer = new Player(250, 250, 1);
-            gameState = new GameState(map, new System.Collections.Generic.List<Character> { testPlayer });
-            camera = new Camera(GraphicsDevice.Viewport, (int)testPlayer.x, (int)testPlayer.y);
+            gameState = new GameState(map, new System.Collections.Generic.List<Character>());
+            camera = new Camera(GraphicsDevice.Viewport, 0, 0);
+            playerManager = new PlayerManager();
+            playerManager.PlayerConnected += PlayerManager_PlayerConnected;
+        }
+
+        private void PlayerManager_PlayerConnected(int playerIndex)
+        {
+            Player testPlayer = new Player(playerIndex, 250, 250, 1);
+            gameState.Characters.Add(testPlayer);
         }
 
         /// <summary>
@@ -73,7 +81,11 @@ namespace monoCoopGame
             foreach (Character c in gameState.Characters)
                 c.Step(gameState);
 
-            camera.SetCenter((int)gameState.Characters[0].x, (int)gameState.Characters[0].y);
+            if (gameState.Characters.Count > 0)
+                camera.SetCenter(gameState.Characters[0].X, gameState.Characters[0].Y);
+
+            if (GamePad.GetState(0).Buttons.RightShoulder == ButtonState.Pressed)
+                graphics.ToggleFullScreen();
 
             base.Update(gameTime);
         }

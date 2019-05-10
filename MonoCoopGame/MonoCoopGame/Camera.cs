@@ -1,11 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace monoCoopGame
 {
@@ -20,7 +14,7 @@ namespace monoCoopGame
 
         private Viewport view;
 
-        public Camera (Viewport view, int x = 0, int y = 0, float zoom = 3f, float rotation = 0)
+        public Camera (Viewport view, int x = 0, int y = 0, float zoom = 2f, float rotation = 0)
         {
             this.view = view;
             Center = new Point(x - (view.Width / 2), y - (view.Height / 2));

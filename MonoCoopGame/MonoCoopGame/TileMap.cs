@@ -7,12 +7,6 @@ namespace monoCoopGame
 {
     public class TileMap
     {
-
-        public enum TileLayer
-        {
-            Background, Foreground, Item
-        }
-
         public struct Adjacency
         {
             public bool N, E, W, S;
@@ -34,15 +28,15 @@ namespace monoCoopGame
                 for (int j = 0; j < yMapSize; j++)
                 {
                     if (i < 2 || j < 2 || j > yMapSize - 2 || i > xMapSize - 2)
-                        Map[i, j] = new Tile(Tile.TileType.Water, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
+                        Map[i, j] = new Tile(Tile.TileType.Water);
                     else
                     {
                         int xPara = Math.Abs(i - Map.GetUpperBound(0) / 2);
                         int yPara = Math.Abs(j - Map.GetUpperBound(1) / 2);
                         if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 10 && Utility.R.Next(30) > 0)
-                            Map[i, j] = new Tile(Tile.TileType.Grass, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
+                            Map[i, j] = new Tile(Tile.TileType.Grass);
                         else
-                            Map[i, j] = new Tile(Tile.TileType.Water, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
+                            Map[i, j] = new Tile(Tile.TileType.Water);
                     }
                 }
 
@@ -82,39 +76,11 @@ namespace monoCoopGame
                 adj.E |= dirtAdj.E;
                 adj.S |= dirtAdj.S;
                 Map[gridX, gridY].Sprite = new Sprite(GetTileTexture(Tile.TileType.Grass, adj));
-                //Map[gridX, gridY].fgRect = Sprites.TileRects[TileType.Grass][adj];
-
-                //Map[gridX, gridY].drawBg = !(adj.N && adj.E && adj.W && adj.S);
-                //if (Map[gridX, gridY].drawBg)
-                //{
-                //    adj = GetAdjacency(gridX, gridY, TileType.Water);
-                //    if (adj.N || adj.E || adj.W || adj.S)
-
-                //        //Update image
-                //        //Map[gridX, gridY].bgRect = new Rectangle(51, 17, size, size); //water
-                //    else
-                //        //Update image
-                //        //Map[gridX, gridY].bgRect = new Rectangle(136, 170, size, size); //dirt
-                //}
             }
             else if (Map[gridX, gridY].Type == Tile.TileType.Dirt)
             {
                 Adjacency adj = GetAdjacency(gridX, gridY, Tile.TileType.Dirt);
                 Map[gridX, gridY].Sprite = new Sprite(GetTileTexture(Tile.TileType.Dirt, adj));
-                //Update image
-                //Map[gridX, gridY].fgRect = Sprites.TileRects[TileType.Dirt][adj];
-
-                //Map[gridX, gridY].drawBg = !(adj.N && adj.E && adj.W && adj.S);
-                //if (Map[gridX, gridY].drawBg)
-                //{
-                //    adj = GetAdjacency(gridX, gridY, TileType.Water);
-                //    if (adj.N || adj.E || adj.W || adj.S)
-                //        //Update image
-                //        //Map[gridX, gridY].bgRect = new Rectangle(51, 17, size, size); //water
-                //    else
-                //        //Update image
-                //        //Map[gridX, gridY].bgRect = new Rectangle(136, 272, size, size); //grass
-                //}
             }
         }
 
@@ -134,40 +100,18 @@ namespace monoCoopGame
             return adj;
         }
 
-        /// <summary>
-        /// Checks for the initial placement of a WaterFlow at a point on the map, and places it.
-        /// </summary>
-        /// <param name="gridX">The grid x.</param>
-        /// <param name="gridY">The grid y.</param>
-        private void CheckWaterFlow(int gridX, int gridY)
-        {
-            if (Map[gridX, gridY].Type != Tile.TileType.Dirt)
-                return;
-
-            Adjacency adj = GetAdjacency(gridX, gridY, Tile.TileType.Water);
-            // IMPLEMENT WATERFLOW
-            // ...or don't
-            //if (adj.N || adj.W || adj.E || adj.S)
-            //    new WaterFlow(gridX, gridY);
-        }
-
         public bool PointIsInMap(int gridX, int gridY)
         {
-            return (gridX >= 0 || gridY >= 0 || gridX <= Map.GetUpperBound(0) || gridY <= Map.GetUpperBound(1));
+            return (gridX >= 0 && gridY >= 0 && gridX <= Map.GetUpperBound(0) && gridY <= Map.GetUpperBound(1));
         }
 
         public void ChangeTile(int gridX, int gridY, Tile.TileType type)
         {
-            //Don't allow tiles to be changed on the outer border - water needed for predator spawning
-            if (gridX < 1 || gridY < 1 || gridX > Map.GetUpperBound(0) - 1 || gridY > Map.GetUpperBound(1) - 1 || Map[gridX, gridY].Type == type)
-                return;
-
-            Map[gridX, gridY].Type = type;
-
-            if (type == Tile.TileType.Dirt)
-                CheckWaterFlow(gridX, gridY);
-
-            UpdateImagePart(gridX, gridY);
+            if (PointIsInMap(gridX, gridY) && Map[gridX, gridY].Type != type)
+            {
+                Map[gridX, gridY] = new Tile(type);
+                UpdateImagePart(gridX, gridY);
+            }
         }
 
         public static Texture2D GetTileTexture(Tile.TileType tileType, Adjacency adj)
@@ -198,7 +142,7 @@ namespace monoCoopGame
         {
             for (int i = 0; i < Map.GetUpperBound(0); i++)
                 for (int j = 0; j < Map.GetUpperBound(1); j++)
-                    Map[i, j].Draw(spriteBatch);
+                    Map[i, j].Draw(spriteBatch, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
         }
 
         public Tile GetTileAtPoint(int x, int y)

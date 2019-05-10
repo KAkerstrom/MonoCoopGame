@@ -10,99 +10,47 @@ namespace monoCoopGame
     {
         public const int TILE_SIZE = 16;
 
-        #region Enums & Structs
-
         public enum TileType
         {
-            None, Water, Grass, Dirt
+            None, Water, Grass, Dirt, Stone
         }
 
-        #endregion Enums & Structs
-
-        #region Static
-
-        public static Tile[,] Map { get; set; }
-
-        #endregion Static
-
-        #region Private Fields
-
-        private TileType type;
-        private int x;
-        private int y;
-
-        #endregion Private Fields
-
-        #region Public Properties
-
-        public double SpeedModifier { get; set; } = 1;
-        public bool IsSolid { get; private set; }
-
-        public TileType Type
-        {
-            get => type;
-            set { SetType(value); }
-        }
-
+        public TileType Type { get; }
         public Sprite Sprite { get; set; }
-
-        #endregion Public Properties
-
-        #region Constructors
+        public float SpeedModifier { get; set; } = 1;
+        public bool IsSolid { get { return SpeedModifier == 0; } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tile"/> class.
         /// </summary>
         /// <param name="type">The tile type.</param>
-        public Tile(TileType type, int x, int y)
+        public Tile(TileType type)
         {
-            SetType(type);
-            this.x = x;
-            this.y = y;
+            Type = type;
+            switch (type)
+            {
+                case TileType.Water:
+                    SetProperties("water", 0.4f);
+                    break;
+                case TileType.Stone:
+                    SetProperties("stone", 1f);
+                    break;
+            }
         }
-
-        #endregion Constructors
-
-        #region Private Methods
 
         /// <summary>
         /// Sets the tile type and applies attributes for that type.
         /// </summary>
         /// <param name="type">The tile type.</param>
-        private void SetType(TileType type)
+        private void SetProperties(string texturePrefix, float speedModifier)
         {
-            this.type = type;
-            switch (type)
-            {
-                case TileType.Water:
-                    IsSolid = true;
-                    SpeedModifier = 0.4;
-                    Sprite = new Sprite(Sprite.GetTexture("water_"));
-                    break;
-                case TileType.Grass:
-                    IsSolid = false;
-                    SpeedModifier = 1;
-                    Sprite = new Sprite(Sprite.GetTexture("stone_"));
-                    break;
-                case TileType.Dirt:
-                    IsSolid = false;
-                    SpeedModifier = 1.5;
-                    Sprite = new Sprite(Sprite.GetTexture("stone_"));
-                    break;
-            }
+            Sprite = new Sprite(Sprite.GetTexture(texturePrefix + "_"));
+            SpeedModifier = speedModifier;
         }
 
-        #endregion Private Methods
-
-        #region Public Methods
-
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            //if (Sprite != null)
             Sprite.Draw(spriteBatch, x, y);
         }
-
-        #endregion Public Methods
-
     }
 }

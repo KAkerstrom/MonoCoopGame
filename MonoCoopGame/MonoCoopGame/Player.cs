@@ -9,30 +9,39 @@ namespace monoCoopGame
     {
         public int PlayerIndex { get; set; }
 
-        public Player(int x, int y, float moveSpeed) : base(x, y, moveSpeed)
+        public Player(int playerIndex, int x, int y, float moveSpeed) : base(x, y, moveSpeed)
         {
-            Texture2D[] textures = new Texture2D[]
+            PlayerIndex = playerIndex;
+            texturePrefix = "char" + (playerIndex + 1);
+            string[] actions = { "walk" };
+            foreach (string act in actions)
             {
-                Sprite.GetTexture("char01_s_01"),
-                Sprite.GetTexture("char01_s_02"),
-                Sprite.GetTexture("char01_s_01"),
-                Sprite.GetTexture("char01_s_03"),
-            };
-            sprite = new Sprite(textures, 20);
-            PlayerIndex = 0;
+                if (!sprites.ContainsKey(act))
+                    sprites.Add(act, new Dictionary<Directions, Sprite>());
+
+                for (int dir = 0; dir < 4; dir++)
+                {
+                    List<Texture2D> newSprite = new List<Texture2D>();
+                    string textureName = $"{texturePrefix}_{act}_" + "news"[dir] + "_";
+                    int[] indexes = { 1, 0, 2, 0 };
+                    foreach (int i in indexes) //Might be better to just rename them to "0, 1, 2, 3"
+                        newSprite.Add(Sprite.GetTexture(textureName + i));
+                    sprites[act].Add((Directions)dir, new Sprite(newSprite.ToArray(), 15));
+                }
+            }
+            sprite = sprites["walk"][Directions.South];
         }
 
         /// <summary>
-        /// Performs the logic for each frame.
-        /// Wall collision could be made more efficient.
-        /// Currently checks 4 corners per direction, rather than a theoretical max of 3.
+        /// Performs the logic for each update.
         /// </summary>
         /// <param name="gameState">The game state.</param>
         public override void Step(GameState gameState)
         {
             sprite.Update();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex);
-            Move(gameState, gamePadState.ThumbSticks.Left.X * moveSpeed, -gamePadState.ThumbSticks.Left.Y * moveSpeed);
+            currentMoveSpeed = gamePadState.IsButtonDown(Buttons.X) ? moveSpeed * 2 : moveSpeed;
+            Move(gameState, gamePadState.ThumbSticks.Left.X * currentMoveSpeed, -gamePadState.ThumbSticks.Left.Y * currentMoveSpeed);
         }
     }
 }

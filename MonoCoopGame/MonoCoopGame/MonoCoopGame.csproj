@@ -47,6 +47,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sprite.cs" />

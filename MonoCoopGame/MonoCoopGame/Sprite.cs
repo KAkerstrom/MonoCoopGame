@@ -10,9 +10,10 @@ namespace monoCoopGame
     {
         private static Dictionary<string, Texture2D> textureLib = new Dictionary<string, Texture2D>();
 
+        public int Speed;
+        public int SpriteIndex = 0;
+
         private Texture2D[] frames;
-        private int speed;
-        private int spriteIndex = 0;
         private int animTimer = 0;
 
         public int Width { get { return frames[0].Width; } }
@@ -22,28 +23,32 @@ namespace monoCoopGame
         {
             this.frames = new Texture2D[1];
             frames[0] = frame;
-            this.speed = speed;
+            this.Speed = speed;
         }
 
         public Sprite(Texture2D[] frames, int speed = 0)
         {
             this.frames = frames;
-            this.speed = speed;
+            this.Speed = speed;
         }
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            spriteBatch.Draw(frames[spriteIndex], new Rectangle(x, y, frames[spriteIndex].Bounds.Width, frames[spriteIndex].Bounds.Height), Color.White);
+            spriteBatch.Draw(frames[SpriteIndex], new Rectangle(x, y, frames[SpriteIndex].Bounds.Width, frames[SpriteIndex].Bounds.Height), Color.White);
         }
 
         public void Update()
         {
-            // Should probably take in a delta value to cap FPS
-            if (frames.Length > 1 && animTimer++ > speed)
+            if (Speed > 0 && animTimer++ > Speed)
             {
-                spriteIndex = (spriteIndex + 1) % frames.Length;
+                SpriteIndex = (SpriteIndex + 1) % frames.Length;
                 animTimer = 0;
             }
+        }
+
+        public static bool TextureExists(string name)
+        {
+            return textureLib.ContainsKey(name);
         }
 
         public static Texture2D GetTexture(string name)
@@ -66,5 +71,12 @@ namespace monoCoopGame
                 textureLib.Add(filename, manager.Load<Texture2D>(folder + "/" + filename));
             }
         }
+    }
+
+    public struct CharacterSprite
+    {
+        string action;
+        Directions Direction;
+        Sprite Sprite;
     }
 }
