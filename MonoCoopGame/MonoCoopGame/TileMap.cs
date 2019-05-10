@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace monoCoopGame
@@ -12,7 +11,12 @@ namespace monoCoopGame
             public bool N, E, W, S;
         }
 
-        public Tile[,] Map { get; set; }
+        public enum Layers
+        {
+            Dirt, Grass, Stone
+        }
+
+        public Sprite[,,] Map { get; set; }
 
         /// <summary>
         /// Creates a new tile-map.
@@ -22,102 +26,105 @@ namespace monoCoopGame
             if (xMapSize < 1 || yMapSize < 1)
                 throw new Exception("Cannot create a map with less than 1 tile.");
 
-            Map = new Tile[xMapSize, yMapSize];
+            Map = new Sprite[3, xMapSize, yMapSize];
 
-            for (int i = 0; i < xMapSize; i++)
-                for (int j = 0; j < yMapSize; j++)
-                {
-                    if (i < 2 || j < 2 || j > yMapSize - 2 || i > xMapSize - 2)
-                        Map[i, j] = new Tile(Tile.TileType.Water);
-                    else
+            for (int layer = 0; layer < 3; layer++)
+            {
+                for (int i = 0; i < xMapSize; i++)
+                    for (int j = 0; j < yMapSize; j++)
                     {
-                        int xPara = Math.Abs(i - Map.GetUpperBound(0) / 2);
-                        int yPara = Math.Abs(j - Map.GetUpperBound(1) / 2);
-                        if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 10 && Utility.R.Next(30) > 0)
-                            Map[i, j] = new Tile(Utility.R.Next(2) == 0 ? Tile.TileType.Stone : Tile.TileType.Dirt);
+                        if (i < 2 || j < 2 || j > yMapSize - 2 || i > xMapSize - 2)
+                            Map[(int)Layers.Stone, i, j] = new Sprite();
                         else
-                            Map[i, j] = new Tile(Tile.TileType.Water);
+                        {
+                            int xPara = Math.Abs(i - Map.GetUpperBound(1) / 2);
+                            int yPara = Math.Abs(j - Map.GetUpperBound(2) / 2);
+                            if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 10 && Utility.R.Next(30) > 0)
+                            {
+                                Map[(int)Layers.Dirt, i, j] = new Sprite();
+                                if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 10 && Utility.R.Next(30) > 0)
+                                    Map[(int)Layers.Grass, i, j] = new Sprite();
+                            }
+                        }
                     }
-                }
+            }
 
             UpdateFullImage();
         }
 
         private void UpdateFullImage()
         {
-            for (int i = 0; i <= Map.GetUpperBound(0); i++)
+            for (int i = 0; i < 3; i++)
                 for (int j = 0; j <= Map.GetUpperBound(1); j++)
-                    UpdateAdjacency(i, j);
+                    for (int k = 0; k <= Map.GetUpperBound(2); k++)
+                        if (Map[i, j, k] != null)
+                        {
+                            Adjacency adj = GetAdjacency((Layers)i, j, k);
+                            Map[i, j, k] = new Sprite(GetTileTexture((Layers)i, adj));
+                        }
         }
 
-        private void UpdateImagePart(int gridX, int gridY)
+        private void UpdateImagePart(Layers layer, int gridX, int gridY)
         {
             if (!PointIsInMap(gridX, gridY))
                 return;
 
-            UpdateAdjacency(gridX, gridY);
-            if (PointIsInMap(gridX - 1, gridY)) UpdateAdjacency(gridX - 1, gridY);
-            if (PointIsInMap(gridX + 1, gridY)) UpdateAdjacency(gridX + 1, gridY);
-            if (PointIsInMap(gridX, gridY - 1)) UpdateAdjacency(gridX, gridY - 1);
-            if (PointIsInMap(gridX, gridY + 1)) UpdateAdjacency(gridX, gridY + 1);
+            UpdateSprite(layer, gridX, gridY);
+            if (PointIsInMap(gridX - 1, gridY)) UpdateSprite(layer, gridX - 1, gridY);
+            if (PointIsInMap(gridX + 1, gridY)) UpdateSprite(layer, gridX + 1, gridY);
+            if (PointIsInMap(gridX, gridY - 1)) UpdateSprite(layer, gridX, gridY - 1);
+            if (PointIsInMap(gridX, gridY + 1)) UpdateSprite(layer, gridX, gridY + 1);
         }
 
-        private void UpdateAdjacency(int gridX, int gridY)
+        private void UpdateSprite(Layers layer, int gridX, int gridY)
+        {
+            Adjacency adj = GetAdjacency(layer, gridX, gridY);
+            Map[(int)layer, gridX, gridY] = new Sprite(GetTileTexture(layer, adj));
+        }
+
+        private Adjacency GetAdjacency(Layers layer, int gridX, int gridY)
         {
             if (!PointIsInMap(gridX, gridY))
-                return;
+                return new Adjacency();
 
-            if (Map[gridX, gridY].Type == Tile.TileType.Stone)
-            {
-                Adjacency adj = GetAdjacency(gridX, gridY, Tile.TileType.Stone);
-                Adjacency dirtAdj = GetAdjacency(gridX, gridY, Tile.TileType.Dirt);
-                adj.N |= dirtAdj.N;
-                adj.W |= dirtAdj.W;
-                adj.E |= dirtAdj.E;
-                adj.S |= dirtAdj.S;
-                Map[gridX, gridY].Sprite = new Sprite(GetTileTexture(Tile.TileType.Stone, adj));
-            }
-            else if (Map[gridX, gridY].Type == Tile.TileType.Dirt)
-            {
-                Adjacency adj = GetAdjacency(gridX, gridY, Tile.TileType.Dirt);
-                Map[gridX, gridY].Sprite = new Sprite(GetTileTexture(Tile.TileType.Dirt, adj));
-            }
-        }
-
-        public void LoadMap(Tile[,] map)
-        {
-            Map = map;
-            UpdateFullImage();
-        }
-
-        private Adjacency GetAdjacency(int gridX, int gridY, Tile.TileType type)
-        {
             Adjacency adj = new Adjacency();
-            adj.N = (gridY > 0) && type == Map[gridX, gridY - 1].Type;
-            adj.W = (gridX > 0) && type == Map[gridX - 1, gridY].Type;
-            adj.E = (gridX < Map.GetUpperBound(0)) && type == Map[gridX + 1, gridY].Type;
-            adj.S = (gridY < Map.GetUpperBound(1)) && type == Map[gridX, gridY + 1].Type;
+            if (Map[(int)layer, gridX, gridY] != null)
+            {
+                adj.N = (gridY > 0) && Map[(int)layer, gridX, gridY - 1] != null;
+                adj.E = (gridX < Map.GetUpperBound(1)) && Map[(int)layer, gridX + 1, gridY] != null;
+                adj.W = (gridX > 0) && Map[(int)layer, gridX - 1, gridY] != null;
+                adj.S = (gridY < Map.GetUpperBound(2)) && Map[(int)layer, gridX, gridY + 1] != null;
+            }
             return adj;
         }
 
         public bool PointIsInMap(int gridX, int gridY)
         {
-            return (gridX >= 0 && gridY >= 0 && gridX <= Map.GetUpperBound(0) && gridY <= Map.GetUpperBound(1));
+            return (gridX >= 0 && gridY >= 0 && gridX <= Map.GetUpperBound(1) && gridY <= Map.GetUpperBound(2));
         }
 
-        public void ChangeTile(int gridX, int gridY, Tile.TileType type)
+        public void AddTile(Layers layer, int gridX, int gridY)
         {
-            if (PointIsInMap(gridX, gridY) && Map[gridX, gridY].Type != type)
+            if (PointIsInMap(gridX, gridY))
             {
-                Map[gridX, gridY] = new Tile(type);
-                UpdateImagePart(gridX, gridY);
+                Map[(int)layer, gridX, gridY] = new Sprite();
+                UpdateImagePart(layer, gridX, gridY);
             }
         }
 
-        public static Texture2D GetTileTexture(Tile.TileType tileType, Adjacency adj)
+        public void RemoveTile(Layers layer, int gridX, int gridY)
+        {
+            if (PointIsInMap(gridX, gridY))
+            {
+                Map[(int)layer, gridX, gridY] = null;
+                UpdateImagePart(layer, gridX, gridY);
+            }
+        }
+
+        public static Texture2D GetTileTexture(Layers layer, Adjacency adj)
         {
             StringBuilder texture = new StringBuilder(15);
-            texture.Append(tileType.ToString().ToLower() + "_");
+            texture.Append(layer.ToString().ToLower() + "_");
 
             if (!adj.N)
                 texture.Append("n");
@@ -133,14 +140,24 @@ namespace monoCoopGame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            for (int i = 0; i < Map.GetUpperBound(0); i++)
+            for (int i = 0; i < 3; i++)
                 for (int j = 0; j < Map.GetUpperBound(1); j++)
-                    Map[i, j].Draw(spriteBatch, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
+                    for (int k = 0; k < Map.GetUpperBound(2); k++)
+                        if (Map[i, j, k] != null)
+                            Map[i, j, k].Draw(spriteBatch, j * Tile.TILE_SIZE, k * Tile.TILE_SIZE);
         }
 
-        public Tile GetTileAtPoint(int x, int y)
+        public bool IsTileAtPoint(int x, int y)
         {
-            return Map[x / Tile.TILE_SIZE, y / Tile.TILE_SIZE];
+            for (int i = 0; i < 3; i++)
+                if (Map[i, x / Tile.TILE_SIZE, y / Tile.TILE_SIZE] != null)
+                    return false;
+            return true;
+        }
+
+        public bool IsTileAtPoint(Layers layer, int x, int y)
+        {
+            return Map[(int)layer, x / Tile.TILE_SIZE, y / Tile.TILE_SIZE] != null;
         }
     }
 }

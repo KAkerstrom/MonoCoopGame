@@ -19,6 +19,13 @@ namespace monoCoopGame
         public int Width { get { return frames[0].Width; } }
         public int Height { get { return frames[0].Height; } }
 
+        public Sprite()
+        {
+            this.frames = new Texture2D[1];
+            frames[0] = GetTexture("null");
+            Speed = 0;
+        }
+
         public Sprite(Texture2D frame, int speed = 0)
         {
             this.frames = new Texture2D[1];
@@ -71,12 +78,5 @@ namespace monoCoopGame
                 textureLib.Add(filename, manager.Load<Texture2D>(folder + "/" + filename));
             }
         }
-    }
-
-    public struct CharacterSprite
-    {
-        string action;
-        Directions Direction;
-        Sprite Sprite;
     }
 }
