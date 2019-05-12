@@ -42,12 +42,7 @@ namespace monoCoopGame
 
         protected void Move(GameState gameState, float xDelta, float yDelta)
         {
-            float speedModifier = 1;
-            if (!gameState.Map.IsTileAtPoint((int)x + Hitbox.Width / 2, (int)y + Hitbox.Height / 2))
-                speedModifier = 0.4f;
-            else if (!gameState.Map.IsTileAtPoint(TileMap.Layers.Dirt, (int)x + Hitbox.Width / 2, (int)y + Hitbox.Height / 2))
-                speedModifier = 1.3f;
-
+            float speedModifier = gameState.Map.GetTileAtPoint(X + Hitbox.Width / 2, Y + Hitbox.Height / 2).SpeedModifier;
             xDelta *= speedModifier;
             yDelta *= speedModifier;
 
@@ -79,27 +74,27 @@ namespace monoCoopGame
 
             if (x > xPrevious)
             {
-                if (gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, X + Hitbox.Width, YPrevious)
-                    || gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, X + Hitbox.Width, YPrevious + Hitbox.Height))
+                if (gameState.Map.GetTileAtPoint(X + Hitbox.Width, YPrevious).IsSolid
+                    || gameState.Map.GetTileAtPoint(X + Hitbox.Width, YPrevious + Hitbox.Height).IsSolid)
                     x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
             }
             else if (x < xPrevious)
             {
-                if (gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, X, YPrevious)
-                    || gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, X, YPrevious + Hitbox.Height))
+                if (gameState.Map.GetTileAtPoint(X, YPrevious).IsSolid
+                    || gameState.Map.GetTileAtPoint(X, YPrevious + Hitbox.Height).IsSolid)
                     x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
             }
 
             if (y > yPrevious)
             {
-                if (gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, XPrevious, Y + Hitbox.Width)
-                    || gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, XPrevious + Hitbox.Width, Y + Hitbox.Height))
+                if (gameState.Map.GetTileAtPoint(XPrevious, Y + Hitbox.Width).IsSolid
+                    || gameState.Map.GetTileAtPoint(XPrevious + Hitbox.Width, Y + Hitbox.Height).IsSolid)
                     y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
             }
             else if (y < yPrevious)
             {
-                if (gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, XPrevious, Y)
-                    || gameState.Map.IsTileAtPoint(TileMap.Layers.Stone, XPrevious + Hitbox.Width, Y))
+                if (gameState.Map.GetTileAtPoint(XPrevious, Y).IsSolid
+                    || gameState.Map.GetTileAtPoint(XPrevious + Hitbox.Width, Y).IsSolid)
                     y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
             }
         }

@@ -1,7 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework.Graphics;
 using System.Text;
 
 namespace monoCoopGame
@@ -10,14 +7,19 @@ namespace monoCoopGame
     {
         public const int TILE_SIZE = 16;
 
+        public struct Adjacencies
+        {
+            public bool N, E, W, S;
+        }
+
         public enum TileType
         {
-            None, Water, Grass, Dirt, Stone
+            Water, Dirt, Grass, Stone
         }
 
         public TileType Type { get; }
-        public Sprite Sprite { get; set; }
-        public Sprite BgSprite { get; set; }
+        public Sprite[] Sprites { get; set; }
+        public Adjacencies Adjacency { get; set; }
         public float SpeedModifier { get; set; } = 1;
         public bool IsSolid { get { return SpeedModifier == 0; } }
 
@@ -28,33 +30,44 @@ namespace monoCoopGame
         public Tile(TileType type)
         {
             Type = type;
-            switch (type)
-            {
-                case TileType.Water:
-                    SetProperties("water", 0.4f);
-                    break;
-                case TileType.Dirt:
-                    SetProperties("dirt", 1.3f);
-                    break;
-                case TileType.Stone:
-                    SetProperties("stone", 1f);
-                    break;
-            }
+            Sprites = new Sprite[(int)type];
+            if (type == TileType.Dirt) SpeedModifier = 1.3f;
+            else if (type == TileType.Water) SpeedModifier = 0.6f;
+            else if (type == TileType.Stone) SpeedModifier = 0.7f;
         }
 
-        /// <summary>
-        /// Sets the tile type and applies attributes for that type.
-        /// </summary>
-        /// <param name="type">The tile type.</param>
-        private void SetProperties(string texturePrefix, float speedModifier)
+        public void UpdateSprites(Adjacencies[] adj)
         {
-            Sprite = new Sprite(Sprite.GetTexture(texturePrefix + "_"));
-            SpeedModifier = speedModifier;
+            for (int i = 0; i < adj.Length; i++)
+            {
+                StringBuilder texture = new StringBuilder(15);
+                texture.Append(((TileType)(i + 1)).ToString().ToLower() + "_");
+                if (!adj[i].N)
+                    texture.Append("n");
+                if (!adj[i].E)
+                    texture.Append("e");
+                if (!adj[i].W)
+                    texture.Append("w");
+                if (!adj[i].S)
+                    texture.Append("s");
+                Sprites[i] = new Sprite(Sprite.GetTexture(texture.ToString()));
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch, int x, int y)
         {
-            Sprite.Draw(spriteBatch, x, y);
+            if (Type == TileType.Water)
+            {
+                Sprite waterSpr = new Sprite(Sprite.GetTexture("water_"));
+                waterSpr.Draw(spriteBatch, x, y);
+            }
+            else
+                for (int i = 0; i < (int)Type; i++)
+                {
+                    if (Sprites[i] != null)
+                        Sprites[i].Draw(spriteBatch, x, y);
+
+                }
         }
     }
 }

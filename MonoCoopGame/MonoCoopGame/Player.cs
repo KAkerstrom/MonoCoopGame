@@ -8,6 +8,8 @@ namespace monoCoopGame
     public class Player : Character
     {
         public int PlayerIndex { get; set; }
+        private bool DEBUGBUTTONX = true;
+        private bool DEBUGBUTTONY = true;
 
         public Player(int playerIndex, int x, int y, float moveSpeed) : base(x, y, moveSpeed)
         {
@@ -40,7 +42,31 @@ namespace monoCoopGame
         {
             sprite.Update();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex);
-            currentMoveSpeed = gamePadState.IsButtonDown(Buttons.X) ? moveSpeed * 2 : moveSpeed;
+
+            //some debug stuff
+            currentMoveSpeed = gamePadState.IsButtonDown(Buttons.A) ? moveSpeed * 2 : moveSpeed;
+
+            Point center = new Point(X + Hitbox.Width / 2, Y + Hitbox.Height / 2);
+            Tile.TileType oldType = gameState.Map.GetTileAtPoint(center.X, center.Y).Type;
+
+            if (gamePadState.IsButtonDown(Buttons.X))
+            {
+                if (DEBUGBUTTONX && gamePadState.IsButtonDown(Buttons.X) && (int)oldType - 1 >= 0)
+                    gameState.Map.ChangeTile((center.X) / Tile.TILE_SIZE, (center.Y) / Tile.TILE_SIZE, new Tile((Tile.TileType)((int)oldType - 1)));
+                DEBUGBUTTONX = false;
+            }
+            else
+                DEBUGBUTTONX = true;
+
+            if (gamePadState.IsButtonDown(Buttons.Y))
+            {
+                if (DEBUGBUTTONY && (int)oldType + 1 <= 3)
+                    gameState.Map.ChangeTile((center.X) / Tile.TILE_SIZE, (center.Y) / Tile.TILE_SIZE, new Tile((Tile.TileType)((int)oldType + 1)));
+                DEBUGBUTTONY = false;
+            }
+            else
+                DEBUGBUTTONY = true;
+
             Move(gameState, gamePadState.ThumbSticks.Left.X * currentMoveSpeed, -gamePadState.ThumbSticks.Left.Y * currentMoveSpeed);
         }
     }

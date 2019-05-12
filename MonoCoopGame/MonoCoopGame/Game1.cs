@@ -96,8 +96,7 @@ namespace monoCoopGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
+            GraphicsDevice.Clear(new Color(99, 197, 207));
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, camera.Transform);
             gameState.Map.Draw(spriteBatch);
             foreach (Character character in gameState.Characters)
