@@ -19,6 +19,9 @@ namespace monoCoopGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            graphics.PreferredBackBufferHeight = 600;
+            graphics.PreferredBackBufferWidth = 900;
         }
 
         /// <summary>
@@ -30,6 +33,7 @@ namespace monoCoopGame
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+
             //graphics.ToggleFullScreen();
             base.Initialize();
         }
@@ -85,7 +89,22 @@ namespace monoCoopGame
                 camera.SetCenter(gameState.Characters[0].X, gameState.Characters[0].Y);
 
             if (GamePad.GetState(0).Buttons.RightShoulder == ButtonState.Pressed)
-                graphics.ToggleFullScreen();
+            {
+                if (graphics.IsFullScreen)
+                {
+                    graphics.PreferredBackBufferHeight = 600;
+                    graphics.PreferredBackBufferWidth = 900;
+                    graphics.IsFullScreen = false;
+                }
+                else
+                {
+                    graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+                    graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+                    graphics.IsFullScreen = true;
+                }
+                camera.SetView(GraphicsDevice.Viewport);
+                graphics.ApplyChanges();
+            }
 
             base.Update(gameTime);
         }
