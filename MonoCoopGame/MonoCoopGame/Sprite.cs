@@ -39,6 +39,13 @@ namespace monoCoopGame
             this.Speed = speed;
         }
 
+        public Sprite(string textureName)
+        {
+            frames = new Texture2D[1];
+            frames[0] = GetTexture(textureName);
+            Speed = 0;
+        }
+
         public void Draw(SpriteBatch spriteBatch, int x, int y)
         {
             spriteBatch.Draw(frames[SpriteIndex], new Rectangle(x, y, frames[SpriteIndex].Bounds.Width, frames[SpriteIndex].Bounds.Height), Color.White);

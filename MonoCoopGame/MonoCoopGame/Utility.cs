@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
 
 namespace monoCoopGame
 {
@@ -10,5 +12,6 @@ namespace monoCoopGame
     static class Utility
     {
         public static Random R = new Random();
+        public static Dictionary<string, SpriteFont> Fonts = new Dictionary<string, SpriteFont>();
     }
 }

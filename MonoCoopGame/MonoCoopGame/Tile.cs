@@ -14,7 +14,7 @@ namespace monoCoopGame
 
         public enum TileType
         {
-            Water, Dirt, Grass, Stone
+            Water, Stone, Dirt, Grass
         }
 
         public TileType Type { get; }
@@ -33,7 +33,7 @@ namespace monoCoopGame
             Sprites = new Sprite[(int)type];
             if (type == TileType.Dirt) SpeedModifier = 1.3f;
             else if (type == TileType.Water) SpeedModifier = 0.6f;
-            else if (type == TileType.Stone) SpeedModifier = 0.7f;
+            else if (type == TileType.Stone) SpeedModifier = 1.3f;
         }
 
         public void UpdateSprites(Adjacencies[] adj)

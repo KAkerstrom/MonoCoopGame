@@ -42,17 +42,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Actions\Action.cs" />
+    <Compile Include="Blocks\Block.cs" />
+    <Compile Include="Blocks\Bush.cs" />
+    <Compile Include="Blocks\Door.cs" />
+    <Compile Include="Blocks\WallStone.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameState.cs" />
+    <Compile Include="GUI.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerGUI.cs" />
     <Compile Include="PlayerManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reticle.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="Tile.cs" />
-    <Compile Include="TileMap.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

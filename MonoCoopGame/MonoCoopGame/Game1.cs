@@ -49,8 +49,9 @@ namespace monoCoopGame
 
             // TODO: use this.Content to load your game content here
             Sprite.LoadSprites(this.Content, "img");
+            Utility.Fonts.Add("playerGUI", Content.Load<SpriteFont>("playerGUI"));
 
-            TileMap map = new TileMap(50, 50);
+            Map map = new Map(50, 50);
             gameState = new GameState(map, new System.Collections.Generic.List<Character>());
             camera = new Camera(GraphicsDevice.Viewport, 0, 0);
             playerManager = new PlayerManager();
@@ -82,13 +83,12 @@ namespace monoCoopGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            foreach (Character c in gameState.Characters)
-                c.Step(gameState);
+            gameState.Step();
 
             if (gameState.Characters.Count > 0)
-                camera.SetCenter(gameState.Characters[0].X, gameState.Characters[0].Y);
+                camera.SetCenter(gameState.Characters[0].Pos.X, gameState.Characters[0].Pos.Y);
 
-            if (GamePad.GetState(0).Buttons.RightShoulder == ButtonState.Pressed)
+            if (GamePad.GetState(0).Buttons.Start == ButtonState.Pressed)
             {
                 if (graphics.IsFullScreen)
                 {
@@ -117,9 +117,11 @@ namespace monoCoopGame
         {
             GraphicsDevice.Clear(new Color(99, 197, 207));
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, camera.Transform);
-            gameState.Map.Draw(spriteBatch);
-            foreach (Character character in gameState.Characters)
-                character.Draw(spriteBatch);
+            gameState.Draw(spriteBatch);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
+            gameState.DrawGUI(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

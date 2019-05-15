@@ -7,11 +7,21 @@ namespace monoCoopGame
 {
     public abstract class Character
     {
-        public int X { get { return (int)x; } }
-        public int Y { get { return (int)y; } }
-        public int XPrevious { get { return (int)xPrevious; } }
-        public int YPrevious { get { return (int)yPrevious; } }
         public Directions Facing;
+        public Point Pos { get { return new Point((int)x, (int)y); } }
+        public Point PreviousPos { get { return new Point((int)xPrevious, (int)yPrevious); } }
+        public Point PreviousGridPos
+        {
+            get { return new Point(PreviousHitbox.Center.X / Tile.TILE_SIZE, PreviousHitbox.Center.Y / Tile.TILE_SIZE); }
+        }
+        public Point GridPos
+        {
+            get { return new Point(Hitbox.Center.X / Tile.TILE_SIZE, Hitbox.Center.Y / Tile.TILE_SIZE); }
+        }
+        public Rectangle PreviousHitbox
+        {
+            get { return new Rectangle(PreviousPos.X, PreviousPos.Y, Tile.TILE_SIZE - 4, Tile.TILE_SIZE - 4); }
+        }
         public Rectangle Hitbox
         {
             get { return new Rectangle((int)x, (int)y, Tile.TILE_SIZE - 4, Tile.TILE_SIZE - 4); }
@@ -22,6 +32,7 @@ namespace monoCoopGame
         protected float moveSpeed;
         protected float currentMoveSpeed;
         protected string texturePrefix;
+        protected string action;
         protected Dictionary<string, Dictionary<Directions, Sprite>> sprites
             = new Dictionary<string, Dictionary<Directions, Sprite>>();
 
@@ -31,18 +42,24 @@ namespace monoCoopGame
             this.x = xPrevious = x;
             this.y = yPrevious = y;
             Facing = Directions.South;
+            action = "walk";
         }
 
         public abstract void Step(GameState gameState);
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            BeginDraw(spriteBatch);
             sprite.Draw(spriteBatch, (int)x - 2, (int)y - 2);
+            EndDraw(spriteBatch);
         }
+
+        protected abstract void BeginDraw(SpriteBatch spriteBatch);
+        protected abstract void EndDraw(SpriteBatch spriteBatch);
 
         protected void Move(GameState gameState, float xDelta, float yDelta)
         {
-            float speedModifier = gameState.Map.GetTileAtPoint(X + Hitbox.Width / 2, Y + Hitbox.Height / 2).SpeedModifier;
+            float speedModifier = gameState.Map.GetTileAtPoint(Hitbox.Center.X, Hitbox.Center.Y).SpeedModifier;
             xDelta *= speedModifier;
             yDelta *= speedModifier;
 
@@ -54,6 +71,22 @@ namespace monoCoopGame
             Directions facingPrevious = Facing;
             if (xDelta != 0 || yDelta != 0)
             {
+                if (GridPos != PreviousGridPos)
+                {
+                    Tile previousTile = gameState.Map.TileMap[PreviousGridPos.X, PreviousGridPos.Y];
+                    Tile currentTile = gameState.Map.TileMap[GridPos.X, GridPos.Y];
+                    if (previousTile.Type == Tile.TileType.Water && currentTile.Type != Tile.TileType.Water)
+                    {
+                        action = "walk";
+                        sprite = sprites[action][Facing];
+                    }
+                    else if (previousTile.Type != Tile.TileType.Water && currentTile.Type == Tile.TileType.Water)
+                    {
+                        action = "swim";
+                        sprite = sprites[action][Facing];
+                    }
+                }
+
                 sprite.Speed = 20;
                 if (Math.Abs(xDelta) > Math.Abs(yDelta))
                     Facing = (xDelta > 0) ? Directions.East : Directions.West;
@@ -62,41 +95,54 @@ namespace monoCoopGame
 
                 if (facingPrevious != Facing)
                 {
-                    sprite = sprites["walk"][Facing];
+                    sprite = sprites[action][Facing];
                     sprite.SpriteIndex = 0;
                 }
             }
-            else
+            else if (action == "walk")
             {
                 sprite.Speed = 0;
                 sprite.SpriteIndex = 1;
             }
 
+            Point topRL, bottomRL, leftTB, rightTB;
             if (x > xPrevious)
             {
-                if (gameState.Map.GetTileAtPoint(X + Hitbox.Width, YPrevious).IsSolid
-                    || gameState.Map.GetTileAtPoint(X + Hitbox.Width, YPrevious + Hitbox.Height).IsSolid)
-                    x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
+                topRL = new Point(Hitbox.Right, PreviousPos.Y);
+                bottomRL = new Point(Hitbox.Right, PreviousHitbox.Bottom);
             }
             else if (x < xPrevious)
             {
-                if (gameState.Map.GetTileAtPoint(X, YPrevious).IsSolid
-                    || gameState.Map.GetTileAtPoint(X, YPrevious + Hitbox.Height).IsSolid)
-                    x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
+                topRL = new Point(Pos.X, PreviousPos.Y);
+                bottomRL = new Point(Pos.X, PreviousHitbox.Bottom);
             }
+            else
+                topRL = bottomRL = Pos;
 
             if (y > yPrevious)
             {
-                if (gameState.Map.GetTileAtPoint(XPrevious, Y + Hitbox.Width).IsSolid
-                    || gameState.Map.GetTileAtPoint(XPrevious + Hitbox.Width, Y + Hitbox.Height).IsSolid)
-                    y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
+                leftTB = new Point(PreviousPos.X, PreviousHitbox.Bottom);
+                rightTB = new Point(PreviousHitbox.Right, Hitbox.Bottom);
             }
             else if (y < yPrevious)
             {
-                if (gameState.Map.GetTileAtPoint(XPrevious, Y).IsSolid
-                    || gameState.Map.GetTileAtPoint(XPrevious + Hitbox.Width, Y).IsSolid)
-                    y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
+                leftTB = new Point(PreviousPos.X, Pos.Y);
+                rightTB = new Point(PreviousHitbox.Right, Pos.Y);
             }
+            else
+                leftTB = rightTB = Pos;
+
+            if (x != xPrevious)
+                if (x < Tile.TILE_SIZE || Hitbox.Right > gameState.Map.TileMap.GetUpperBound(0) * Tile.TILE_SIZE
+                    || (gameState.Map.IsBlockAtPos(topRL) && gameState.Map.GetBlockAtPos(topRL).IsSolid)
+                    || (gameState.Map.IsBlockAtPos(bottomRL) && gameState.Map.GetBlockAtPos(bottomRL).IsSolid))
+                    x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
+
+            if (y != yPrevious)
+                if (y < Tile.TILE_SIZE || Hitbox.Bottom > gameState.Map.TileMap.GetUpperBound(1) * Tile.TILE_SIZE
+                    || (gameState.Map.IsBlockAtPos(leftTB) && gameState.Map.GetBlockAtPos(leftTB).IsSolid)
+                    || (gameState.Map.IsBlockAtPos(rightTB) && gameState.Map.GetBlockAtPos(rightTB).IsSolid))
+                    y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
         }
     }
 }

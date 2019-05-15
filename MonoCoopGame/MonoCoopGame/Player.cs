@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monoCoopGame.Blocks;
 using System.Collections.Generic;
 
 namespace monoCoopGame
@@ -8,14 +9,16 @@ namespace monoCoopGame
     public class Player : Character
     {
         public int PlayerIndex { get; set; }
-        private bool DEBUGBUTTONX = true;
-        private bool DEBUGBUTTONY = true;
+        private PlayerGUI gui;
+        public Reticle Reticle { get; }
+
+        private GamePadState previousGamePadState;
 
         public Player(int playerIndex, int x, int y, float moveSpeed) : base(x, y, moveSpeed)
         {
             PlayerIndex = playerIndex;
             texturePrefix = "char" + (playerIndex + 1);
-            string[] actions = { "walk" };
+            string[] actions = { "walk", "swim" };
             foreach (string act in actions)
             {
                 if (!sprites.ContainsKey(act))
@@ -25,13 +28,15 @@ namespace monoCoopGame
                 {
                     List<Texture2D> newSprite = new List<Texture2D>();
                     string textureName = $"{texturePrefix}_{act}_" + "news"[dir] + "_";
-                    int[] indexes = { 1, 0, 2, 0 };
-                    foreach (int i in indexes) //Might be better to just rename them to "0, 1, 2, 3"
-                        newSprite.Add(Sprite.GetTexture(textureName + i));
+                    int index = 0;
+                    while (Sprite.TextureExists(textureName + index))
+                        newSprite.Add(Sprite.GetTexture(textureName + index++));
                     sprites[act].Add((Directions)dir, new Sprite(newSprite.ToArray(), 15));
                 }
             }
             sprite = sprites["walk"][Directions.South];
+            Reticle = new Reticle(this);
+            gui = new PlayerGUI(new Rectangle(16, 0, 250, 100), this);
         }
 
         /// <summary>
@@ -46,28 +51,65 @@ namespace monoCoopGame
             //some debug stuff
             currentMoveSpeed = gamePadState.IsButtonDown(Buttons.A) ? moveSpeed * 2 : moveSpeed;
 
-            Point center = new Point(X + Hitbox.Width / 2, Y + Hitbox.Height / 2);
-            Tile.TileType oldType = gameState.Map.GetTileAtPoint(center.X, center.Y).Type;
-
-            if (gamePadState.IsButtonDown(Buttons.X))
+            Tile.TileType oldType = gameState.Map.TileMap[Reticle.GridPos.X, Reticle.GridPos.Y].Type;
+            if (gameState.Map.GridPointIsInMap(Reticle.GridPos))
             {
-                if (DEBUGBUTTONX && gamePadState.IsButtonDown(Buttons.X) && (int)oldType - 1 >= 0)
-                    gameState.Map.ChangeTile((center.X) / Tile.TILE_SIZE, (center.Y) / Tile.TILE_SIZE, new Tile((Tile.TileType)((int)oldType - 1)));
-                DEBUGBUTTONX = false;
-            }
-            else
-                DEBUGBUTTONX = true;
+                if (gamePadState.IsButtonDown(Buttons.LeftShoulder) && previousGamePadState.IsButtonUp(Buttons.LeftShoulder))
+                {
+                    if ((int)oldType - 1 >= 0)
+                        gameState.Map.ChangeTile(Reticle.GridPos.X, Reticle.GridPos.Y, new Tile((Tile.TileType)((int)oldType - 1)));
+                }
 
-            if (gamePadState.IsButtonDown(Buttons.Y))
-            {
-                if (DEBUGBUTTONY && (int)oldType + 1 <= 3)
-                    gameState.Map.ChangeTile((center.X) / Tile.TILE_SIZE, (center.Y) / Tile.TILE_SIZE, new Tile((Tile.TileType)((int)oldType + 1)));
-                DEBUGBUTTONY = false;
+                if (gamePadState.IsButtonDown(Buttons.RightShoulder) && previousGamePadState.IsButtonUp(Buttons.RightShoulder))
+                {
+                    if ((int)oldType + 1 <= 3)
+                        gameState.Map.ChangeTile(Reticle.GridPos.X, Reticle.GridPos.Y, new Tile((Tile.TileType)((int)oldType + 1)));
+                }
+
+                if (gamePadState.IsButtonDown(Buttons.X) && previousGamePadState.IsButtonUp(Buttons.X))
+                    if (gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
+                        gameState.Map.GetBlockAtGridPos(Reticle.GridPos).Use(this, gameState);
+
+                if (gamePadState.IsButtonDown(Buttons.B) && previousGamePadState.IsButtonUp(Buttons.B))
+                {
+                    if (gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
+                        gameState.Map.GetBlockAtGridPos(Reticle.GridPos).Damage(this, gameState, 1);
+                }
+
+                if (gamePadState.DPad.Down == ButtonState.Pressed)
+                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
+                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
+                        gameState.Map.AddBlock(new Bush(Reticle.GridPos));
+
+                if (gamePadState.DPad.Left == ButtonState.Pressed)
+                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
+                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
+                        gameState.Map.AddBlock(new WallStone(Reticle.GridPos));
+
+                if (gamePadState.DPad.Up == ButtonState.Pressed)
+                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
+                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
+                        gameState.Map.AddBlock(new Door(Reticle.GridPos));
+
             }
-            else
-                DEBUGBUTTONY = true;
 
             Move(gameState, gamePadState.ThumbSticks.Left.X * currentMoveSpeed, -gamePadState.ThumbSticks.Left.Y * currentMoveSpeed);
+            previousGamePadState = gamePadState;
+        }
+
+        protected override void BeginDraw(SpriteBatch spriteBatch)
+        {
+            GamePadState gamePadState = GamePad.GetState(PlayerIndex);
+            Reticle.Draw(spriteBatch, gamePadState.Triggers.Left);
+        }
+
+        protected override void EndDraw(SpriteBatch spriteBatch)
+        {
+        }
+
+        public void DrawGUI(SpriteBatch spriteBatch)
+        {
+            gui.Draw(spriteBatch);
         }
     }
 }
