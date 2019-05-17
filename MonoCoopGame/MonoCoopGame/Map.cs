@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using monoCoopGame.Blocks;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace monoCoopGame
 {
@@ -57,36 +57,79 @@ namespace monoCoopGame
         {
             for (int i = 0; i <= TileMap.GetUpperBound(0); i++)
                 for (int j = 0; j <= TileMap.GetUpperBound(1); j++)
+                {
+                    Point checkPoint = new Point(i, j);
                     if (TileMap[i, j].Type != Tile.TileType.Water)
                     {
-                        Tile.Adjacencies[] adj = GetAdjacencies(i, j);
+                        Adjacencies[] adj = GetTileAdjacencies(checkPoint);
                         TileMap[i, j].UpdateSprites(adj);
                     }
-        }
 
-        private void UpdateImagePart(int gridX, int gridY)
-        {
-            for (int i = gridX - 1; i <= gridX + 1; i++)
-                for (int j = gridY - 1; j <= gridY + 1; j++)
-                    if (GridPointIsInMap(i, j))
+                    if (BlockMap[i, j] != null && BlockMap[i, j] is BlobBlock)
                     {
-                        Tile.Adjacencies[] adj = GetAdjacencies(i, j);
-                        TileMap[i, j].UpdateSprites(adj);
+                        Adjacencies adj = GetBlockAdjacencies(checkPoint);
+                        ((BlobBlock)BlockMap[i, j]).UpdateSprite(adj);
                     }
+                }
         }
 
-        private Tile.Adjacencies[] GetAdjacencies(int gridX, int gridY)
+        private void UpdateImagePart(Point gridPos)
         {
-            Tile.TileType thisType = TileMap[gridX, gridY].Type;
-            Tile.Adjacencies[] adj = new Tile.Adjacencies[(int)thisType];
-            if (GridPointIsInMap(gridX, gridY) && thisType != Tile.TileType.Water)
+            for (int i = gridPos.X - 1; i <= gridPos.X + 1; i++)
+                for (int j = gridPos.Y - 1; j <= gridPos.Y + 1; j++)
+                {
+                    Point checkPoint = new Point(i, j);
+                    if (GridPointIsInMap(checkPoint))
+                    {
+                        Adjacencies[] tileAdj = GetTileAdjacencies(checkPoint);
+                        TileMap[i, j].UpdateSprites(tileAdj);
+
+                        if (BlockMap[i, j] != null && BlockMap[i, j] is BlobBlock)
+                        {
+                            Adjacencies adj = GetBlockAdjacencies(checkPoint);
+                            ((BlobBlock)BlockMap[i, j]).UpdateSprite(adj);
+                        }
+                    }
+                }
+        }
+
+        private Adjacencies[] GetTileAdjacencies(Point gridPos)
+        {
+            Tile.TileType thisType = TileMap[gridPos.X, gridPos.Y].Type;
+            Adjacencies[] adj = new Adjacencies[(int)thisType];
+            if (GridPointIsInMap(gridPos.X, gridPos.Y) && thisType != Tile.TileType.Water)
                 for (int i = 0; i < (int)thisType; i++)
                 {
-                    adj[i].N = (gridY > 0) && (int)TileMap[gridX, gridY - 1].Type > i;
-                    adj[i].E = (gridX < TileMap.GetUpperBound(0)) && (int)TileMap[gridX + 1, gridY].Type > i;
-                    adj[i].W = (gridX > 0) && (int)TileMap[gridX - 1, gridY].Type > i;
-                    adj[i].S = (gridY < TileMap.GetUpperBound(1)) && (int)TileMap[gridX, gridY + 1].Type > i;
+                    adj[i].N = (gridPos.Y > 0) && (int)TileMap[gridPos.X, gridPos.Y - 1].Type > i;
+                    adj[i].E = (gridPos.X < TileMap.GetUpperBound(0)) && (int)TileMap[gridPos.X + 1, gridPos.Y].Type > i;
+                    adj[i].W = (gridPos.X > 0) && (int)TileMap[gridPos.X - 1, gridPos.Y].Type > i;
+                    adj[i].S = (gridPos.Y < TileMap.GetUpperBound(1)) && (int)TileMap[gridPos.X, gridPos.Y + 1].Type > i;
                 }
+            return adj;
+        }
+
+        private Adjacencies GetBlockAdjacencies(Point gridPos)
+        {
+            string thisClass = ((BlobBlock)BlockMap[gridPos.X, gridPos.Y]).BlobGroup;
+            Adjacencies adj = new Adjacencies();
+            if (GridPointIsInMap(gridPos.X, gridPos.Y))
+            {
+                adj.N = (gridPos.Y > 0)
+                    && BlockMap[gridPos.X, gridPos.Y - 1] is BlobBlock
+                    && ((BlobBlock)BlockMap[gridPos.X, gridPos.Y - 1])?.BlobGroup == thisClass;
+
+                adj.E = (gridPos.X < TileMap.GetUpperBound(0)) 
+                    && BlockMap[gridPos.X - 1, gridPos.Y] is BlobBlock
+                    && ((BlobBlock)BlockMap[gridPos.X - 1, gridPos.Y])?.BlobGroup == thisClass;
+
+                adj.W = (gridPos.X > 0) 
+                    && BlockMap[gridPos.X + 1, gridPos.Y] is BlobBlock
+                    && ((BlobBlock)BlockMap[gridPos.X + 1, gridPos.Y])?.BlobGroup == thisClass;
+
+                adj.S = (gridPos.Y < TileMap.GetUpperBound(1)) 
+                    && BlockMap[gridPos.X, gridPos.Y + 1] is BlobBlock
+                    && ((BlobBlock)BlockMap[gridPos.X, gridPos.Y + 1])?.BlobGroup == thisClass;
+            }
             return adj;
         }
 
@@ -100,16 +143,17 @@ namespace monoCoopGame
             return (gridX >= 1 && gridY >= 1 && gridX <= TileMap.GetUpperBound(0) - 1 && gridY <= TileMap.GetUpperBound(1) - 1);
         }
 
-        public void ChangeTile(int gridX, int gridY, Tile newTile)
+        public void ChangeTile(Point gridPos, Tile newTile)
         {
-            TileMap[gridX, gridY] = newTile;
-            UpdateImagePart(gridX, gridY);
+            TileMap[gridPos.X, gridPos.Y] = newTile;
+            UpdateImagePart(gridPos);
         }
 
         public void Step(GameState gameState)
         {
-            foreach (Block b in Blocks)
-                b.Step(gameState);
+            for (int i = 1; i < TileMap.GetUpperBound(0); i++)
+                for (int j = 1; j < TileMap.GetUpperBound(1); j++)
+                    BlockMap[i,j]?.Step(gameState);
         }
 
         public void Draw(SpriteBatch spriteBatch)
@@ -122,17 +166,14 @@ namespace monoCoopGame
                 block.Draw(spriteBatch);
         }
 
-        public Tile GetTileAtPoint(int x, int y)
-        {
-            return TileMap[x / Tile.TILE_SIZE, y / Tile.TILE_SIZE];
-        }
-
         public void AddBlock(Block newBlock)
         {
             if (BlockMap[newBlock.GridPos.X, newBlock.GridPos.Y] == null)
             {
                 Blocks.Add(newBlock);
                 BlockMap[newBlock.GridPos.X, newBlock.GridPos.Y] = newBlock;
+                if (newBlock is BlobBlock)
+                    UpdateImagePart(newBlock.GridPos);
                 newBlock.BlockDestroyed += BlockDestroyed;
             }
             else
@@ -150,6 +191,8 @@ namespace monoCoopGame
             {
                 Blocks.Remove(block);
                 BlockMap[block.GridPos.X, block.GridPos.Y] = null;
+                if (block is BlobBlock)
+                    UpdateImagePart(block.GridPos);
             }
         }
 
@@ -181,6 +224,15 @@ namespace monoCoopGame
         public Tile GetTileAtGridPos(Point gridPos)
         {
             return TileMap[gridPos.X, gridPos.Y];
+        }
+
+        public float GetSpeedModifierAtPos(Point pos)
+        {
+            Point gridPos = new Point(pos.X / Tile.TILE_SIZE, pos.Y / Tile.TILE_SIZE);
+            float speedMod = TileMap[gridPos.X, gridPos.Y].SpeedModifier;
+            if(BlockMap[gridPos.X, gridPos.Y] != null)
+                speedMod = BlockMap[gridPos.X, gridPos.Y].SpeedModifier;
+            return speedMod;
         }
     }
 }

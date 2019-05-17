@@ -95,12 +95,14 @@ namespace monoCoopGame
                     graphics.PreferredBackBufferHeight = 600;
                     graphics.PreferredBackBufferWidth = 900;
                     graphics.IsFullScreen = false;
+                    camera.SetZoom(2f);
                 }
                 else
                 {
                     graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
                     graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
                     graphics.IsFullScreen = true;
+                    camera.SetZoom(3f);
                 }
                 camera.SetView(GraphicsDevice.Viewport);
                 graphics.ApplyChanges();

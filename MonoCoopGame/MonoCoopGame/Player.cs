@@ -17,7 +17,7 @@ namespace monoCoopGame
         public Player(int playerIndex, int x, int y, float moveSpeed) : base(x, y, moveSpeed)
         {
             PlayerIndex = playerIndex;
-            texturePrefix = "char" + (playerIndex + 1);
+            texturePrefix = "char" + (playerIndex);
             string[] actions = { "walk", "swim" };
             foreach (string act in actions)
             {
@@ -57,13 +57,13 @@ namespace monoCoopGame
                 if (gamePadState.IsButtonDown(Buttons.LeftShoulder) && previousGamePadState.IsButtonUp(Buttons.LeftShoulder))
                 {
                     if ((int)oldType - 1 >= 0)
-                        gameState.Map.ChangeTile(Reticle.GridPos.X, Reticle.GridPos.Y, new Tile((Tile.TileType)((int)oldType - 1)));
+                        gameState.Map.ChangeTile(Reticle.GridPos, new Tile((Tile.TileType)((int)oldType - 1)));
                 }
 
                 if (gamePadState.IsButtonDown(Buttons.RightShoulder) && previousGamePadState.IsButtonUp(Buttons.RightShoulder))
                 {
                     if ((int)oldType + 1 <= 3)
-                        gameState.Map.ChangeTile(Reticle.GridPos.X, Reticle.GridPos.Y, new Tile((Tile.TileType)((int)oldType + 1)));
+                        gameState.Map.ChangeTile(Reticle.GridPos, new Tile((Tile.TileType)((int)oldType + 1)));
                 }
 
                 if (gamePadState.IsButtonDown(Buttons.X) && previousGamePadState.IsButtonUp(Buttons.X))
@@ -91,9 +91,19 @@ namespace monoCoopGame
                         && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
                         gameState.Map.AddBlock(new Door(Reticle.GridPos));
 
+                if (gamePadState.DPad.Right== ButtonState.Pressed)
+                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
+                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
+                        gameState.Map.AddBlock(new Slime(Reticle.GridPos, this));
+
             }
 
             Move(gameState, gamePadState.ThumbSticks.Left.X * currentMoveSpeed, -gamePadState.ThumbSticks.Left.Y * currentMoveSpeed);
+            if (gameState.Map.GetBlockAtGridPos(GridPos) is Blocks.Slime)
+            {
+                action = "swim";
+                sprite = sprites[action][Facing];
+            }
             previousGamePadState = gamePadState;
         }
 

@@ -59,7 +59,7 @@ namespace monoCoopGame
 
         protected void Move(GameState gameState, float xDelta, float yDelta)
         {
-            float speedModifier = gameState.Map.GetTileAtPoint(Hitbox.Center.X, Hitbox.Center.Y).SpeedModifier;
+            float speedModifier = gameState.Map.GetSpeedModifierAtPos(Hitbox.Center);
             xDelta *= speedModifier;
             yDelta *= speedModifier;
 
@@ -73,18 +73,13 @@ namespace monoCoopGame
             {
                 if (GridPos != PreviousGridPos)
                 {
-                    Tile previousTile = gameState.Map.TileMap[PreviousGridPos.X, PreviousGridPos.Y];
                     Tile currentTile = gameState.Map.TileMap[GridPos.X, GridPos.Y];
-                    if (previousTile.Type == Tile.TileType.Water && currentTile.Type != Tile.TileType.Water)
-                    {
-                        action = "walk";
-                        sprite = sprites[action][Facing];
-                    }
-                    else if (previousTile.Type != Tile.TileType.Water && currentTile.Type == Tile.TileType.Water)
-                    {
+                    if (currentTile.Type == Tile.TileType.Water
+                        || gameState.Map.GetBlockAtGridPos(GridPos) is Blocks.Slime)
                         action = "swim";
-                        sprite = sprites[action][Facing];
-                    }
+                    else
+                        action = "walk";
+                    sprite = sprites[action][Facing];
                 }
 
                 sprite.Speed = 20;

@@ -45,6 +45,8 @@
     <Compile Include="Blocks\Block.cs" />
     <Compile Include="Blocks\Bush.cs" />
     <Compile Include="Blocks\Door.cs" />
+    <Compile Include="Blocks\BlobBlock.cs" />
+    <Compile Include="Blocks\Slime.cs" />
     <Compile Include="Blocks\WallStone.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Character.cs" />

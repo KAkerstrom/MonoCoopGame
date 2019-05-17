@@ -7,7 +7,6 @@ namespace monoCoopGame.Blocks
         public WallStone(Point gridPos) : base(new Sprite("wallStone"), gridPos)
         {
             IsSolid = true;
-            Blobbable = true;
         }
 
         public override void Step(GameState gameState)

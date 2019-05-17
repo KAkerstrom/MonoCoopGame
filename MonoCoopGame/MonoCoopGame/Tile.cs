@@ -7,11 +7,6 @@ namespace monoCoopGame
     {
         public const int TILE_SIZE = 16;
 
-        public struct Adjacencies
-        {
-            public bool N, E, W, S;
-        }
-
         public enum TileType
         {
             Water, Stone, Dirt, Grass

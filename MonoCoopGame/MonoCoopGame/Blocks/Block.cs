@@ -13,7 +13,7 @@ namespace monoCoopGame
         public Sprite Sprite;
         public Point GridPos { get; }
         public Point Pos { get { return new Point(GridPos.X * Tile.TILE_SIZE, GridPos.Y * Tile.TILE_SIZE); } }
-        public bool Blobbable = false;
+        public float SpeedModifier = 1;
         public bool IsSolid = false;
         public bool Visible = true;
         public int Health = 10;

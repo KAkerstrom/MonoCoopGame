@@ -9,6 +9,19 @@ namespace monoCoopGame
         North, East, West, South
     }
 
+    public struct Adjacencies
+    {
+        public Adjacencies(bool north, bool east, bool west, bool south)
+        {
+            N = north;
+            E = east;
+            W = west;
+            S = south;
+        }
+
+        public bool N, E, W, S;
+    }
+
     static class Utility
     {
         public static Random R = new Random();
