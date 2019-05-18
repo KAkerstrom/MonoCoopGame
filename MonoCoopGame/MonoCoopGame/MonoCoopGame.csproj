@@ -41,18 +41,26 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Actions\Action.cs" />
-    <Compile Include="Blocks\Block.cs" />
-    <Compile Include="Blocks\Bush.cs" />
-    <Compile Include="Blocks\Door.cs" />
-    <Compile Include="Blocks\BlobBlock.cs" />
-    <Compile Include="Blocks\Slime.cs" />
-    <Compile Include="Blocks\WallStone.cs" />
+    <Compile Include="Inventory.cs" />
+    <Compile Include="Tiles\Block.cs" />
+    <Compile Include="Tiles\Bush.cs" />
+    <Compile Include="Tiles\Dirt.cs" />
+    <Compile Include="Tiles\Door.cs" />
+    <Compile Include="Tiles\Blob.cs" />
+    <Compile Include="Tiles\Grass.cs" />
+    <Compile Include="Tiles\IDestroyable.cs" />
+    <Compile Include="Tiles\IOwnable.cs" />
+    <Compile Include="Tiles\ISteppable.cs" />
+    <Compile Include="Tiles\IUsable.cs" />
+    <Compile Include="Tiles\Slime.cs" />
+    <Compile Include="Tiles\Tile.cs" />
+    <Compile Include="Tiles\WallStone.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="GUI.cs" />
+    <Compile Include="TileMap.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerGUI.cs" />
     <Compile Include="PlayerManager.cs" />
@@ -60,8 +68,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reticle.cs" />
     <Compile Include="Sprite.cs" />
-    <Compile Include="Tile.cs" />
-    <Compile Include="Map.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>
   <ItemGroup>

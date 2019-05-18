@@ -1,17 +1,32 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace monoCoopGame.Blocks
+namespace monoCoopGame.Tiles
 {
-    public class Door : Block
+    public class Door : Tile, ISteppable, IUsable, IDestroyable
     {
+        public event TileDestroyedDelegate TileDestroyed;
+        public int Health { get; private set; }
         private bool isOpen = false;
         private bool isLiminal = false;
 
         public Door(Point gridPos) : base(new Sprite("doorWood"), gridPos)
         {
+            HasTransparency = true;
         }
 
-        public override void Step(GameState gameState)
+        public void Damage(int damage, GameState gameState, Player player = null)
+        {
+            Health -= damage;
+            if (Health <= 0)
+                Destroy(player);
+        }
+
+        public void Destroy(Player player = null)
+        {
+            TileDestroyed?.Invoke(this, player);
+        }
+
+        public void Step(GameState gameState)
         {
             if (isOpen)
             {
@@ -31,10 +46,10 @@ namespace monoCoopGame.Blocks
                         }
                 }
             }
-            IsSolid = !isOpen;
+            SpeedModifier = isOpen ? 1 : 0;
         }
 
-        public override void Use(Player player, GameState gameState)
+        public void Use(Player player, GameState gameState)
         {
             if (!isLiminal)
                 isOpen = !isOpen;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using monoCoopGame.Blocks;
+using monoCoopGame.Tiles;
 using System.Collections.Generic;
 
 namespace monoCoopGame
@@ -11,6 +11,7 @@ namespace monoCoopGame
         public int PlayerIndex { get; set; }
         private PlayerGUI gui;
         public Reticle Reticle { get; }
+        public Inventory Inventory;
 
         private GamePadState previousGamePadState;
 
@@ -36,6 +37,7 @@ namespace monoCoopGame
             }
             sprite = sprites["walk"][Directions.South];
             Reticle = new Reticle(this);
+            Inventory = new Inventory();
             gui = new PlayerGUI(new Rectangle(16, 0, 250, 100), this);
         }
 
@@ -47,59 +49,74 @@ namespace monoCoopGame
         {
             sprite.Update();
             GamePadState gamePadState = GamePad.GetState(PlayerIndex);
+            TileMap map = gameState.Map;
 
             //some debug stuff
-            currentMoveSpeed = gamePadState.IsButtonDown(Buttons.A) ? moveSpeed * 2 : moveSpeed;
+            currentMoveSpeed = moveSpeed - (moveSpeed * gamePadState.Triggers.Left * 0.5f);
 
-            Tile.TileType oldType = gameState.Map.TileMap[Reticle.GridPos.X, Reticle.GridPos.Y].Type;
-            if (gameState.Map.GridPointIsInMap(Reticle.GridPos))
+            if (gamePadState.IsButtonDown(Buttons.LeftShoulder) && previousGamePadState.IsButtonUp(Buttons.LeftShoulder))
             {
-                if (gamePadState.IsButtonDown(Buttons.LeftShoulder) && previousGamePadState.IsButtonUp(Buttons.LeftShoulder))
+                if (gamePadState.Triggers.Right == 0)
                 {
-                    if ((int)oldType - 1 >= 0)
-                        gameState.Map.ChangeTile(Reticle.GridPos, new Tile((Tile.TileType)((int)oldType - 1)));
+                    Inventory.DecrementIndex();
                 }
-
-                if (gamePadState.IsButtonDown(Buttons.RightShoulder) && previousGamePadState.IsButtonUp(Buttons.RightShoulder))
+                else
                 {
-                    if ((int)oldType + 1 <= 3)
-                        gameState.Map.ChangeTile(Reticle.GridPos, new Tile((Tile.TileType)((int)oldType + 1)));
+                    if (map.IsTileAtGridPos(TileMap.Layers.Grass, Reticle.GridPos))
+                        map.RemoveTile(TileMap.Layers.Grass, Reticle.GridPos);
+                    else if (map.IsTileAtGridPos(TileMap.Layers.Dirt, Reticle.GridPos))
+                        map.RemoveTile(TileMap.Layers.Dirt, Reticle.GridPos);
                 }
+            }
 
-                if (gamePadState.IsButtonDown(Buttons.X) && previousGamePadState.IsButtonUp(Buttons.X))
-                    if (gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
-                        gameState.Map.GetBlockAtGridPos(Reticle.GridPos).Use(this, gameState);
-
-                if (gamePadState.IsButtonDown(Buttons.B) && previousGamePadState.IsButtonUp(Buttons.B))
+            if (gamePadState.IsButtonDown(Buttons.RightShoulder) && previousGamePadState.IsButtonUp(Buttons.RightShoulder))
+            {
+                if (gamePadState.Triggers.Right == 0)
                 {
-                    if (gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
-                        gameState.Map.GetBlockAtGridPos(Reticle.GridPos).Damage(this, gameState, 1);
+                    Inventory.IncrementIndex();
                 }
+                else
+                {
+                    if (!map.IsTileAtGridPos(TileMap.Layers.Dirt, Reticle.GridPos))
+                        map.AddTile(TileMap.Layers.Dirt, new Dirt(Reticle.GridPos));
+                    else if (!map.IsTileAtGridPos(TileMap.Layers.Grass, Reticle.GridPos))
+                        map.AddTile(TileMap.Layers.Grass, new Grass(Reticle.GridPos));
+                }
+            }
 
-                if (gamePadState.DPad.Down == ButtonState.Pressed)
-                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
-                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
-                        gameState.Map.AddBlock(new Bush(Reticle.GridPos));
+            if (gamePadState.IsButtonDown(Buttons.X) && previousGamePadState.IsButtonUp(Buttons.X))
+                if (map.IsTileAtGridPos(Reticle.GridPos)
+                    && !gameState.Map.IsTileAtGridPos(TileMap.Layers.Blocks, Reticle.GridPos))
+                    switch (Inventory.GetCurrentItem())
+                    {
+                        case "wallStone":
+                            gameState.Map.AddTile(new WallStone(Reticle.GridPos));
+                            break;
+                        case "slime":
+                            gameState.Map.AddTile(new Slime(Reticle.GridPos));
+                            break;
+                        case "door":
+                            gameState.Map.AddTile(new Door(Reticle.GridPos));
+                            break;
+                        case "bush":
+                            gameState.Map.AddTile(new Bush(Reticle.GridPos));
+                            break;
+                    }
 
-                if (gamePadState.DPad.Left == ButtonState.Pressed)
-                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
-                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
-                        gameState.Map.AddBlock(new WallStone(Reticle.GridPos));
+            if (gamePadState.IsButtonDown(Buttons.A) && previousGamePadState.IsButtonUp(Buttons.A))
+                if (map.IsTileAtGridPos(Reticle.GridPos)
+                        && map.GetBlockAtGridPos(Reticle.GridPos) is IUsable)
+                    ((IUsable)map.GetBlockAtGridPos(Reticle.GridPos)).Use(this, gameState);
 
-                if (gamePadState.DPad.Up == ButtonState.Pressed)
-                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
-                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
-                        gameState.Map.AddBlock(new Door(Reticle.GridPos));
-
-                if (gamePadState.DPad.Right== ButtonState.Pressed)
-                    if (gameState.Map.GetTileAtGridPos(Reticle.GridPos).Type != Tile.TileType.Water
-                        && !gameState.Map.IsBlockAtGridPos(Reticle.GridPos))
-                        gameState.Map.AddBlock(new Slime(Reticle.GridPos, this));
-
+            if (gamePadState.IsButtonDown(Buttons.B) && previousGamePadState.IsButtonUp(Buttons.B))
+            {
+                if (gameState.Map.IsTileAtGridPos(Reticle.GridPos)
+                    && map.GetBlockAtGridPos(Reticle.GridPos) is IDestroyable)
+                    ((IDestroyable)gameState.Map.GetBlockAtGridPos(Reticle.GridPos)).Damage(1, gameState, this);
             }
 
             Move(gameState, gamePadState.ThumbSticks.Left.X * currentMoveSpeed, -gamePadState.ThumbSticks.Left.Y * currentMoveSpeed);
-            if (gameState.Map.GetBlockAtGridPos(GridPos) is Blocks.Slime)
+            if (!gameState.Map.IsTileAtGridPos(GridPos) || gameState.Map.GetBlockAtGridPos(GridPos) is Slime)
             {
                 action = "swim";
                 sprite = sprites[action][Facing];

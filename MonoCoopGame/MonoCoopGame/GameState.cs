@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using monoCoopGame.Blocks;
+using monoCoopGame.Tiles;
 using System.Collections.Generic;
 
 namespace monoCoopGame
@@ -7,9 +7,9 @@ namespace monoCoopGame
     public class GameState
     {
         public List<Character> Characters = new List<Character>();
-        public Map Map;
+        public TileMap Map;
 
-        public GameState(Map map, List<Character> characters)
+        public GameState(TileMap map, List<Character> characters)
         {
             Map = map;
             Characters = characters;

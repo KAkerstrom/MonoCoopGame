@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace monoCoopGame
 {
@@ -17,6 +18,7 @@ namespace monoCoopGame
         public override void Draw(SpriteBatch spriteBatch)
         {
             DrawBackground(spriteBatch);
+            player.Inventory.Draw(spriteBatch, new Rectangle(drawArea.X + 16, drawArea.Y + 48, 32 * 5, 32));
             spriteBatch.DrawString(Utility.Fonts["playerGUI"], "TEST", new Vector2(drawArea.X + 16, drawArea.Y + 16), Color.Black);
         }
 

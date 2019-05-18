@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using monoCoopGame.Tiles;
 using System;
 using System.Collections.Generic;
 
@@ -59,7 +60,7 @@ namespace monoCoopGame
 
         protected void Move(GameState gameState, float xDelta, float yDelta)
         {
-            float speedModifier = gameState.Map.GetSpeedModifierAtPos(Hitbox.Center);
+            float speedModifier = gameState.Map.GetSpeedModifier(Hitbox.Center);
             xDelta *= speedModifier;
             yDelta *= speedModifier;
 
@@ -73,9 +74,9 @@ namespace monoCoopGame
             {
                 if (GridPos != PreviousGridPos)
                 {
-                    Tile currentTile = gameState.Map.TileMap[GridPos.X, GridPos.Y];
-                    if (currentTile.Type == Tile.TileType.Water
-                        || gameState.Map.GetBlockAtGridPos(GridPos) is Blocks.Slime)
+                    if (!gameState.Map.IsTileAtGridPos(GridPos)
+                        || (gameState.Map.GetBlockAtGridPos(GridPos) != null
+                        && gameState.Map.GetBlockAtGridPos(GridPos) is Slime))
                         action = "swim";
                     else
                         action = "walk";
@@ -128,13 +129,13 @@ namespace monoCoopGame
                 leftTB = rightTB = Pos;
 
             if (x != xPrevious)
-                if (x < Tile.TILE_SIZE || Hitbox.Right > gameState.Map.TileMap.GetUpperBound(0) * Tile.TILE_SIZE
+                if (x < Tile.TILE_SIZE || Hitbox.Right > gameState.Map.Width * Tile.TILE_SIZE
                     || (gameState.Map.IsBlockAtPos(topRL) && gameState.Map.GetBlockAtPos(topRL).IsSolid)
                     || (gameState.Map.IsBlockAtPos(bottomRL) && gameState.Map.GetBlockAtPos(bottomRL).IsSolid))
                     x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
 
             if (y != yPrevious)
-                if (y < Tile.TILE_SIZE || Hitbox.Bottom > gameState.Map.TileMap.GetUpperBound(1) * Tile.TILE_SIZE
+                if (y < Tile.TILE_SIZE || Hitbox.Bottom > gameState.Map.Height * Tile.TILE_SIZE
                     || (gameState.Map.IsBlockAtPos(leftTB) && gameState.Map.GetBlockAtPos(leftTB).IsSolid)
                     || (gameState.Map.IsBlockAtPos(rightTB) && gameState.Map.GetBlockAtPos(rightTB).IsSolid))
                     y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;

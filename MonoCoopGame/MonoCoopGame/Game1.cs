@@ -51,7 +51,7 @@ namespace monoCoopGame
             Sprite.LoadSprites(this.Content, "img");
             Utility.Fonts.Add("playerGUI", Content.Load<SpriteFont>("playerGUI"));
 
-            Map map = new Map(50, 50);
+            TileMap map = new TileMap(50, 50);
             gameState = new GameState(map, new System.Collections.Generic.List<Character>());
             camera = new Camera(GraphicsDevice.Viewport, 0, 0);
             playerManager = new PlayerManager();
