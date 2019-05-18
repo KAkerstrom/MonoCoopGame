@@ -39,14 +39,11 @@ namespace monoCoopGame
                     {
                         int xPara = Math.Abs(i - width / 2);
                         int yPara = Math.Abs(j - height / 2);
-                        if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 10 && Utility.R.Next(30) > 0)
-                            if (Utility.R.Next(4) == 0)
-                                Tiles[(int)Layers.Dirt][i, j] = new Dirt(new Point(i, j));
-                            else
-                            {
-                                Tiles[(int)Layers.Dirt][i, j] = new Dirt(new Point(i, j));
-                                Tiles[(int)Layers.Grass][i, j] = new Grass(new Point(i, j));
-                            }
+                        if (Utility.R.Next(xPara < yPara ? yPara : xPara) < 13 && Utility.R.Next(30) > 0)
+                        {
+                            Tiles[(int)Layers.Dirt][i, j] = new Dirt(new Point(i, j));
+                            Tiles[(int)Layers.Grass][i, j] = new Grass(new Point(i, j));
+                        }
                     }
                 }
 
@@ -216,7 +213,7 @@ namespace monoCoopGame
         public float GetSpeedModifier(Point pos)
         {
             Point gridPos = new Point(pos.X / Tile.TILE_SIZE, pos.Y / Tile.TILE_SIZE);
-            float speedMod = 0.4f;
+            float speedMod = 0.5f;
             for (int i = 0; i <= (int)Layers.Blocks; i++)
                 if (Tiles[i][gridPos.X, gridPos.Y] != null)
                     speedMod = Tiles[i][gridPos.X, gridPos.Y].SpeedModifier;

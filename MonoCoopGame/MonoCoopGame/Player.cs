@@ -52,7 +52,8 @@ namespace monoCoopGame
             TileMap map = gameState.Map;
 
             //some debug stuff
-            currentMoveSpeed = moveSpeed - (moveSpeed * gamePadState.Triggers.Left * 0.5f);
+            currentMoveSpeed = gamePadState.Buttons.A == ButtonState.Pressed ? moveSpeed * 1.5f : moveSpeed;
+            currentMoveSpeed = currentMoveSpeed - (currentMoveSpeed * gamePadState.Triggers.Left * 0.5f);
 
             if (gamePadState.IsButtonDown(Buttons.LeftShoulder) && previousGamePadState.IsButtonUp(Buttons.LeftShoulder))
             {

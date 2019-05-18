@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -15,6 +16,9 @@ namespace monoCoopGame
         PlayerManager playerManager;
         Camera camera;
 
+        Viewport gameView;
+        Viewport playerGuiView;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -22,6 +26,9 @@ namespace monoCoopGame
 
             graphics.PreferredBackBufferHeight = 600;
             graphics.PreferredBackBufferWidth = 900;
+
+            playerGuiView = new Viewport(0, 0, 900, 100);
+            gameView = new Viewport(0, 100, 900, 500);
         }
 
         /// <summary>
@@ -51,9 +58,9 @@ namespace monoCoopGame
             Sprite.LoadSprites(this.Content, "img");
             Utility.Fonts.Add("playerGUI", Content.Load<SpriteFont>("playerGUI"));
 
-            TileMap map = new TileMap(50, 50);
+            TileMap map = new TileMap(60, 40);
             gameState = new GameState(map, new System.Collections.Generic.List<Character>());
-            camera = new Camera(GraphicsDevice.Viewport, 0, 0);
+            camera = new Camera(gameView, 0, 0);
             playerManager = new PlayerManager();
             playerManager.PlayerConnected += PlayerManager_PlayerConnected;
         }
@@ -86,12 +93,39 @@ namespace monoCoopGame
             gameState.Step();
 
             if (gameState.Characters.Count > 0)
-                camera.SetCenter(gameState.Characters[0].Pos.X, gameState.Characters[0].Pos.Y);
+            {
+                int xCenter = 0, yCenter = 0;
+                foreach (Character p in gameState.Characters)
+                    if (p is Player)
+                    {
+                        xCenter += p.Pos.X;
+                        yCenter += p.Pos.Y;
+                    }
+                xCenter /= gameState.Characters.Count;
+                yCenter /= gameState.Characters.Count;
+                camera.SetCenter(xCenter, yCenter);
+
+                int xDistance = 0, yDistance = 0;
+                foreach (Character p in gameState.Characters)
+                    if (p is Player)
+                    {
+                        if (Math.Abs(p.Pos.X - xCenter) > xDistance)
+                            xDistance = Math.Abs(p.Pos.X - xCenter);
+                        if (Math.Abs(p.Pos.Y - yCenter) > yDistance)
+                            yDistance = Math.Abs(p.Pos.Y - yCenter);
+                    }
+                float xRatio = xDistance / (gameView.Width / 2f);
+                float yRatio = yDistance / (gameView.Height / 2f);
+                float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
+                camera.SetZoom(Math.Max(0.8f, Math.Min(3f, zoom)));
+            }
 
             if (GamePad.GetState(0).Buttons.Start == ButtonState.Pressed)
             {
                 if (graphics.IsFullScreen)
                 {
+                    playerGuiView = new Viewport(0, 0, 900, 100);
+                    gameView = new Viewport(0, 100, 900, 500);
                     graphics.PreferredBackBufferHeight = 600;
                     graphics.PreferredBackBufferWidth = 900;
                     graphics.IsFullScreen = false;
@@ -99,12 +133,14 @@ namespace monoCoopGame
                 }
                 else
                 {
+                    gameView = new Viewport(0, 100, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height - 100);
+                    playerGuiView = new Viewport(0, 0, GraphicsDevice.DisplayMode.Width, 100);
                     graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
                     graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
                     graphics.IsFullScreen = true;
                     camera.SetZoom(3f);
                 }
-                camera.SetView(GraphicsDevice.Viewport);
+                camera.SetView(gameView);
                 graphics.ApplyChanges();
             }
 
@@ -118,10 +154,12 @@ namespace monoCoopGame
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(new Color(99, 197, 207));
+            graphics.GraphicsDevice.Viewport = gameView;
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, camera.Transform);
             gameState.Draw(spriteBatch);
             spriteBatch.End();
 
+            graphics.GraphicsDevice.Viewport = playerGuiView;
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
             gameState.DrawGUI(spriteBatch);
             spriteBatch.End();
