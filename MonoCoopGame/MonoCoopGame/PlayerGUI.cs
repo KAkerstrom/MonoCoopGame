@@ -9,9 +9,9 @@ namespace monoCoopGame
         private Player player;
         private Rectangle drawArea;
 
-        public PlayerGUI(Rectangle drawArea, Player player)
+        public PlayerGUI(Player player)
         {
-            this.drawArea = drawArea;
+            this.drawArea = new Rectangle(16 + (player.PlayerIndex * 300), 0, 250, 100);
             this.player = player;
         }
 

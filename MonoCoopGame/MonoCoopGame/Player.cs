@@ -38,7 +38,7 @@ namespace monoCoopGame
             sprite = sprites["walk"][Directions.South];
             Reticle = new Reticle(this);
             Inventory = new Inventory();
-            gui = new PlayerGUI(new Rectangle(16, 0, 250, 100), this);
+            gui = new PlayerGUI(this);
         }
 
         /// <summary>

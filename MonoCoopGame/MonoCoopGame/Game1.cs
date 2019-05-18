@@ -60,7 +60,7 @@ namespace monoCoopGame
 
             TileMap map = new TileMap(60, 40);
             gameState = new GameState(map, new System.Collections.Generic.List<Character>());
-            camera = new Camera(gameView, 0, 0);
+            camera = new Camera(gameView, 30 * 16, 20 * 16);
             playerManager = new PlayerManager();
             playerManager.PlayerConnected += PlayerManager_PlayerConnected;
         }
@@ -143,7 +143,7 @@ namespace monoCoopGame
                 camera.SetView(gameView);
                 graphics.ApplyChanges();
             }
-
+            camera.MoveTowardDestination();
             base.Update(gameTime);
         }
 
