@@ -35,7 +35,6 @@ namespace monoCoopGame
         public void SetCenter(int x, int y)
         {
             MoveDestination = new Point(x, y);
-            UpdateTransform();
         }
 
         public void SetZoom(float zoom)
@@ -69,6 +68,7 @@ namespace monoCoopGame
                 yNew -= MoveSpeed;
 
             CurrentPosition = new Point(xNew, yNew);
+            UpdateTransform();
         }
     }
 }

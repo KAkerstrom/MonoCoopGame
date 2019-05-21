@@ -8,6 +8,7 @@ namespace monoCoopGame
 {
     public abstract class Character
     {
+        public int Health { get; set; }
         public Directions Facing;
         public Point Pos { get { return new Point((int)x, (int)y); } }
         public Point PreviousPos { get { return new Point((int)xPrevious, (int)yPrevious); } }
@@ -44,6 +45,7 @@ namespace monoCoopGame
             this.y = yPrevious = y;
             Facing = Directions.South;
             action = "walk";
+            Health = 50;
         }
 
         public abstract void Step(GameState gameState);
@@ -51,12 +53,17 @@ namespace monoCoopGame
         public void Draw(SpriteBatch spriteBatch)
         {
             BeginDraw(spriteBatch);
-            sprite.Draw(spriteBatch, (int)x - 2, (int)y - 2);
+            sprite.Draw(spriteBatch, (int)x - 2, (int)y - 2, (float)Pos.Y / (30 * Tile.TILE_SIZE)); //TODO: Change to map height variable
             EndDraw(spriteBatch);
         }
 
         protected abstract void BeginDraw(SpriteBatch spriteBatch);
         protected abstract void EndDraw(SpriteBatch spriteBatch);
+
+        public void Damage(int damage, GameState gameState, Player attacker)
+        {
+            Health -= damage;
+        }
 
         protected void Move(GameState gameState, float xDelta, float yDelta)
         {
@@ -92,13 +99,13 @@ namespace monoCoopGame
                 if (facingPrevious != Facing)
                 {
                     sprite = sprites[action][Facing];
-                    sprite.SpriteIndex = 0;
+                    sprite.ImageIndex = 0;
                 }
             }
             else if (action == "walk")
             {
                 sprite.Speed = 0;
-                sprite.SpriteIndex = 1;
+                sprite.ImageIndex = 1;
             }
 
             Point topRL, bottomRL, leftTB, rightTB;
@@ -129,13 +136,13 @@ namespace monoCoopGame
                 leftTB = rightTB = Pos;
 
             if (x != xPrevious)
-                if (x < Tile.TILE_SIZE || Hitbox.Right > gameState.Map.Width * Tile.TILE_SIZE
+                if (x < Tile.TILE_SIZE || Hitbox.Right > gameState.Map.GridWidth * Tile.TILE_SIZE
                     || (gameState.Map.IsBlockAtPos(topRL) && gameState.Map.GetBlockAtPos(topRL).IsSolid)
                     || (gameState.Map.IsBlockAtPos(bottomRL) && gameState.Map.GetBlockAtPos(bottomRL).IsSolid))
                     x = (xPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
 
             if (y != yPrevious)
-                if (y < Tile.TILE_SIZE || Hitbox.Bottom > gameState.Map.Height * Tile.TILE_SIZE
+                if (y < Tile.TILE_SIZE || Hitbox.Bottom > gameState.Map.GridHeight * Tile.TILE_SIZE
                     || (gameState.Map.IsBlockAtPos(leftTB) && gameState.Map.GetBlockAtPos(leftTB).IsSolid)
                     || (gameState.Map.IsBlockAtPos(rightTB) && gameState.Map.GetBlockAtPos(rightTB).IsSolid))
                     y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;

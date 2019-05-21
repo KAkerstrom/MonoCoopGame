@@ -32,6 +32,7 @@ namespace monoCoopGame
                     { "slime", Sprite.GetTexture("slime_news") },
                     { "door", Sprite.GetTexture("doorWood_closed") },
                     { "bush", Sprite.GetTexture("bush") },
+                    { "bomb", Sprite.GetTexture("bomb0") },
                 };
         }
 
@@ -101,26 +102,6 @@ namespace monoCoopGame
         {
             int width = drawArea.Width / 5;
             int height = drawArea.Height;
-
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    int itemIndex = (index + i - 2) % (inventory.Count);
-            //    if (itemIndex < 0)
-            //        itemIndex = inventory.Count + itemIndex;
-
-            //    string itemName = inventory[itemIndex];
-            //    Rectangle itemRect = new Rectangle(drawArea.X + i * width, drawArea.Y, width, height);
-            //    if (i == 2)
-            //    {
-            //        int wider = (int)(width * 0.3);
-            //        int taller = (int)(height * 0.3);
-            //        itemRect = new Rectangle(itemRect.X - wider, itemRect.Y - taller, itemRect.Width + wider * 2, itemRect.Height + taller * 2);
-            //    }
-
-            //    spriteBatch.Draw(textures[itemName], itemRect, Color.White);
-            //}
-
-
             for (int i = 2; i >= 0; i--)
                 for (int j = -1; j <= 1; j += 2) // A bit jank, but it works
                 {

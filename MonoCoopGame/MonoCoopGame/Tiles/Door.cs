@@ -18,10 +18,10 @@ namespace monoCoopGame.Tiles
         {
             Health -= damage;
             if (Health <= 0)
-                Destroy(player);
+                Destroy(gameState, player);
         }
 
-        public void Destroy(Player player = null)
+        public void Destroy(GameState gameState, Player player = null)
         {
             TileDestroyed?.Invoke(this, player);
         }
@@ -32,18 +32,21 @@ namespace monoCoopGame.Tiles
             {
                 if (!isLiminal)
                 {
-                    foreach (Character c in gameState.Characters)
-                        if (c.GridPos == GridPos)
+                    foreach (Player p in gameState.Players)
+                        if (p.GridPos == GridPos)
                             isLiminal = true;
                 }
                 else
                 {
-                    foreach (Character c in gameState.Characters)
-                        if (c.GridPos != GridPos)
-                        {
-                            isLiminal = isOpen = false;
-                            Sprite = new Sprite("doorWood_closed");
-                        }
+                    bool tempLiminal = false;
+                    foreach (Player p in gameState.Players)
+                        if (p.GridPos == GridPos)
+                            tempLiminal = true;
+                    if (!tempLiminal)
+                    {
+                        isLiminal = isOpen = false;
+                        Sprite = new Sprite("doorWood_closed");
+                    }
                 }
             }
             SpeedModifier = isOpen ? 1 : 0;
@@ -53,7 +56,7 @@ namespace monoCoopGame.Tiles
         {
             if (!isLiminal)
                 isOpen = !isOpen;
-            Sprite = new Sprite(isOpen? "doorWood_open" : "doorWood_closed");
+            Sprite = new Sprite(isOpen ? "doorWood_open" : "doorWood_closed");
         }
     }
 }

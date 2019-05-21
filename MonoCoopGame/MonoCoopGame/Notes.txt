@@ -1,0 +1,2 @@
+﻿- Create a Controller class (ButtonPress etc)
+- Make Exposions stop at walls

@@ -8,6 +8,6 @@
 
         int Health { get; }
         void Damage(int damage, GameState gameState, Player player = null);
-        void Destroy(Player player = null);
+        void Destroy(GameState gameState, Player player = null);
     }
 }

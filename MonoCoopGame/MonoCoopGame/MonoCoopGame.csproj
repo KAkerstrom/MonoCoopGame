@@ -43,10 +43,12 @@
   <ItemGroup>
     <Compile Include="Inventory.cs" />
     <Compile Include="Tiles\Block.cs" />
+    <Compile Include="Tiles\Bomb.cs" />
     <Compile Include="Tiles\Bush.cs" />
     <Compile Include="Tiles\Dirt.cs" />
     <Compile Include="Tiles\Door.cs" />
     <Compile Include="Tiles\Blob.cs" />
+    <Compile Include="Tiles\Explosion.cs" />
     <Compile Include="Tiles\Grass.cs" />
     <Compile Include="Tiles\IDestroyable.cs" />
     <Compile Include="Tiles\IOwnable.cs" />
@@ -79,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
+    <Content Include="Notes.txt" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />

@@ -18,10 +18,10 @@ namespace monoCoopGame.Tiles
         {
             Health -= damage;
             if (Health <= 0)
-                Destroy(player);
+                Destroy(gameState, player);
         }
 
-        public void Destroy(Player player = null)
+        public void Destroy(GameState gameState, Player player = null)
         {
             TileDestroyed?.Invoke(this, player);
         }

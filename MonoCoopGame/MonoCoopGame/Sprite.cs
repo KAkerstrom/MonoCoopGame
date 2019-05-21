@@ -6,12 +6,15 @@ using System.IO;
 
 namespace monoCoopGame
 {
+    public delegate void AnimationDoneDelegate();
+
     public class Sprite
     {
+        public event AnimationDoneDelegate AnimationDone;
         private static Dictionary<string, Texture2D> textureLib = new Dictionary<string, Texture2D>();
 
         public int Speed;
-        public int SpriteIndex = 0;
+        public int ImageIndex = 0;
 
         private Texture2D[] frames;
         private int animTimer = 0;
@@ -33,7 +36,7 @@ namespace monoCoopGame
             this.Speed = speed;
         }
 
-        public Sprite(Texture2D[] frames, int speed = 0)
+        public Sprite(Texture2D[] frames, int speed = 2)
         {
             this.frames = frames;
             this.Speed = speed;
@@ -46,16 +49,23 @@ namespace monoCoopGame
             Speed = 0;
         }
 
-        public void Draw(SpriteBatch spriteBatch, int x, int y)
+        public void Draw(SpriteBatch spriteBatch, int x, int y, float depth)
         {
-            spriteBatch.Draw(frames[SpriteIndex], new Rectangle(x, y, frames[SpriteIndex].Bounds.Width, frames[SpriteIndex].Bounds.Height), Color.White);
+            //spriteBatch.Draw(frames[ImageIndex], new Rectangle(x, y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height), Color.White);
+
+            Rectangle drawRect = new Rectangle(x, y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height);
+            spriteBatch.Draw(frames[ImageIndex], drawRect, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, depth);
         }
 
         public void Update()
         {
             if (Speed > 0 && animTimer++ > Speed)
             {
-                SpriteIndex = (SpriteIndex + 1) % frames.Length;
+                if(++ImageIndex == frames.Length)
+                {
+                    ImageIndex = 0;
+                    AnimationDone?.Invoke();
+                }
                 animTimer = 0;
             }
         }

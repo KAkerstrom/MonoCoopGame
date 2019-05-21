@@ -8,6 +8,9 @@ namespace monoCoopGame
 {
     public class TileMap
     {
+        //public static int GridWidth = ;
+        //public static int GridWidth = ;
+
         private static Sprite waterSprite;
 
         public enum Layers
@@ -15,13 +18,16 @@ namespace monoCoopGame
             Dirt, Grass, Blocks
         }
 
-        public int Width, Height;
+        public int GridWidth, GridHeight, Width, Height;
         private Tile[][,] Tiles;
+        private List<Explosion> explosions = new List<Explosion>();
 
         public TileMap(int width, int height)
         {
-            Width = width - 1;
-            Height = height - 1;
+            GridWidth = width - 1;
+            GridHeight = height - 1;
+            Width = GridWidth * Tile.TILE_SIZE;
+            Height = GridHeight * Tile.TILE_SIZE;
             Tiles = new Tile[3][,];
             for (int i = 0; i < 3; i++)
                 Tiles[i] = new Tile[width, height];
@@ -71,21 +77,24 @@ namespace monoCoopGame
 
         public bool IsGridPosInMap(Point gridPos)
         {
-            return (gridPos.X >= 1 && gridPos.Y >= 1 && gridPos.X <= Width - 1 && gridPos.Y <= Height - 1);
+            return (gridPos.X >= 1 && gridPos.Y >= 1 && gridPos.X <= GridWidth - 1 && gridPos.Y <= GridHeight - 1);
         }
 
         public void Step(GameState gameState)
         {
-            for (int i = 1; i < Width; i++)
-                for (int j = 1; j < Height; j++)
+            for (int i = 1; i < GridWidth; i++)
+                for (int j = 1; j < GridHeight; j++)
                     if (Tiles[(int)Layers.Blocks][i, j] != null && Tiles[(int)Layers.Blocks][i, j] is ISteppable)
                         ((ISteppable)Tiles[(int)Layers.Blocks][i, j]).Step(gameState);
+
+            for (int i = explosions.Count - 1; i >= 0; i--)
+                explosions[i].Step(gameState);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void DrawBegin(SpriteBatch spriteBatch)
         {
-            for (int i = 1; i < Width; i++)
-                for (int j = 1; j < Height; j++)
+            for (int i = 1; i < GridWidth; i++)
+                for (int j = 1; j < GridHeight; j++)
                 {
                     // Check each layer to see if it's transparent
                     // Once a non-transparent layer is found, draw from there up
@@ -102,7 +111,7 @@ namespace monoCoopGame
                         {
                             if (layer < 0)
                             {
-                                waterSprite.Draw(spriteBatch, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
+                                waterSprite.Draw(spriteBatch, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE, 0f);
                                 goingUp = true;
                             }
                             else if (Tiles[layer][i, j] != null && !Tiles[layer][i, j].HasTransparency)
@@ -114,6 +123,12 @@ namespace monoCoopGame
                         layer += goingUp ? 1 : -1;
                     }
                 }
+        }
+
+        public void DrawEnd(SpriteBatch spriteBatch)
+        {
+            foreach (Explosion explosion in explosions)
+                explosion.Draw(spriteBatch);
         }
 
         public void AddTile(Tile tile)
@@ -218,6 +233,28 @@ namespace monoCoopGame
                 if (Tiles[i][gridPos.X, gridPos.Y] != null)
                     speedMod = Tiles[i][gridPos.X, gridPos.Y].SpeedModifier;
             return speedMod;
+        }
+
+        public void AddExplosion(Explosion explosion)
+        {
+            if (IsGridPosInMap(explosion.GridPos))
+            {
+                explosions.Add(explosion);
+                explosion.ExplosionDestroyed += ExplosionDestroyed;
+            }
+        }
+
+        public bool IsExplosionAtGridPos(Point gridPos)
+        {
+            foreach (Explosion explosion in explosions)
+                if (explosion.GridPos == gridPos)
+                    return true;
+            return false;
+        }
+
+        private void ExplosionDestroyed(Explosion explosion)
+        {
+            explosions.Remove(explosion);
         }
     }
 }

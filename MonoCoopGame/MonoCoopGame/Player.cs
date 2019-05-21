@@ -102,6 +102,9 @@ namespace monoCoopGame
                         case "bush":
                             gameState.Map.AddTile(new Bush(Reticle.GridPos));
                             break;
+                        case "bomb":
+                            gameState.Map.AddTile(new Bomb(Reticle.GridPos, this));
+                            break;
                     }
 
             if (gamePadState.IsButtonDown(Buttons.A) && previousGamePadState.IsButtonUp(Buttons.A))

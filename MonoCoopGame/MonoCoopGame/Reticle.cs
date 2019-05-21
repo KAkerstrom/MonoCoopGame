@@ -39,7 +39,8 @@ namespace monoCoopGame
 
         public void Draw(SpriteBatch spriteBatch, float alpha)
         {
-            spriteBatch.Draw(Sprite.GetTexture("reticle"), new Rectangle(Pos.X, Pos.Y, Tile.TILE_SIZE, Tile.TILE_SIZE), Color.White * alpha);
+            Rectangle drawRect = new Rectangle(Pos.X, Pos.Y, Tile.TILE_SIZE, Tile.TILE_SIZE);
+            spriteBatch.Draw(Sprite.GetTexture("reticle"), drawRect, null, Color.White * alpha, 0, new Vector2(0, 0), SpriteEffects.None, (float)Pos.Y / (20 * Tile.TILE_SIZE)); //TODO: Change to map height variable
         }
     }
 }

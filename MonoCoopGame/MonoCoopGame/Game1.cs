@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -55,20 +56,21 @@ namespace monoCoopGame
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            Sprite.LoadSprites(this.Content, "img");
+            Sprite.LoadSprites(Content, "img");
             Utility.Fonts.Add("playerGUI", Content.Load<SpriteFont>("playerGUI"));
 
-            TileMap map = new TileMap(60, 40);
-            gameState = new GameState(map, new System.Collections.Generic.List<Character>());
-            camera = new Camera(gameView, 30 * 16, 20 * 16);
+            TileMap map = new TileMap(40, 24);
+            gameState = new GameState(map, new List<Player>());
+            camera = new Camera(gameView, 20 * 16, 12 * 16);
+            camera.SetZoom(1.3f);
             playerManager = new PlayerManager();
             playerManager.PlayerConnected += PlayerManager_PlayerConnected;
         }
 
         private void PlayerManager_PlayerConnected(int playerIndex)
         {
-            Player testPlayer = new Player(playerIndex, 250, 250, 1);
-            gameState.Characters.Add(testPlayer);
+            Player testPlayer = new Player(playerIndex, 15 * 16, 10 * 16, 1);
+            gameState.Players.Add(testPlayer);
         }
 
         /// <summary>
@@ -92,33 +94,31 @@ namespace monoCoopGame
 
             gameState.Step();
 
-            if (gameState.Characters.Count > 0)
-            {
-                int xCenter = 0, yCenter = 0;
-                foreach (Character p in gameState.Characters)
-                    if (p is Player)
-                    {
-                        xCenter += p.Pos.X;
-                        yCenter += p.Pos.Y;
-                    }
-                xCenter /= gameState.Characters.Count;
-                yCenter /= gameState.Characters.Count;
-                camera.SetCenter(xCenter, yCenter);
+            //if (gameState.Players.Count > 0)
+            //{
+            //    int xCenter = 0, yCenter = 0;
+            //    foreach (Character p in gameState.Players)
+            //        {
+            //            xCenter += p.Pos.X;
+            //            yCenter += p.Pos.Y;
+            //        }
+            //    xCenter /= gameState.Players.Count;
+            //    yCenter /= gameState.Players.Count;
+            //    camera.SetCenter(xCenter, yCenter);
 
-                int xDistance = 0, yDistance = 0;
-                foreach (Character p in gameState.Characters)
-                    if (p is Player)
-                    {
-                        if (Math.Abs(p.Pos.X - xCenter) > xDistance)
-                            xDistance = Math.Abs(p.Pos.X - xCenter);
-                        if (Math.Abs(p.Pos.Y - yCenter) > yDistance)
-                            yDistance = Math.Abs(p.Pos.Y - yCenter);
-                    }
-                float xRatio = xDistance / (gameView.Width / 2f);
-                float yRatio = yDistance / (gameView.Height / 2f);
-                float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
-                camera.SetZoom(Math.Max(0.8f, Math.Min(3f, zoom)));
-            }
+            //    int xDistance = 0, yDistance = 0;
+            //    foreach (Character p in gameState.Players)
+            //        {
+            //            if (Math.Abs(p.Hitbox.Center.X - xCenter) > xDistance)
+            //                xDistance = Math.Abs(p.Pos.X - xCenter);
+            //            if (Math.Abs(p.Hitbox.Center.Y - yCenter) > yDistance)
+            //                yDistance = Math.Abs(p.Pos.Y - yCenter);
+            //        }
+            //    float xRatio = xDistance / (gameView.Width / 2f);
+            //    float yRatio = yDistance / (gameView.Height / 2f);
+            //    float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
+            //    camera.SetZoom(Math.Max(0.8f, Math.Min(2f, zoom)));
+            //}
 
             if (GamePad.GetState(0).Buttons.Start == ButtonState.Pressed)
             {
@@ -129,7 +129,7 @@ namespace monoCoopGame
                     graphics.PreferredBackBufferHeight = 600;
                     graphics.PreferredBackBufferWidth = 900;
                     graphics.IsFullScreen = false;
-                    camera.SetZoom(2f);
+                    camera.SetZoom(1.3f);
                 }
                 else
                 {
@@ -138,7 +138,7 @@ namespace monoCoopGame
                     graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
                     graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
                     graphics.IsFullScreen = true;
-                    camera.SetZoom(3f);
+                    camera.SetZoom(1.7f);
                 }
                 camera.SetView(gameView);
                 graphics.ApplyChanges();
