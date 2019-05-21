@@ -41,7 +41,7 @@ namespace monoCoopGame
             for (int i = 0; i < width; i++)
                 for (int j = 0; j < height; j++)
                 {
-                    if (i > 1 && j > 1 && j < height - 2 && i < width - 2)
+                    if (i > 0 && j > 0 && j < height - 1 && i < width - 1)
                     {
                         int xPara = Math.Abs(i - width / 2);
                         int yPara = Math.Abs(j - height / 2);

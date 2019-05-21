@@ -62,7 +62,6 @@ namespace monoCoopGame
             TileMap map = new TileMap(40, 24);
             gameState = new GameState(map, new List<Player>());
             camera = new Camera(gameView, 20 * 16, 12 * 16);
-            camera.SetZoom(1.3f);
             playerManager = new PlayerManager();
             playerManager.PlayerConnected += PlayerManager_PlayerConnected;
         }
@@ -94,31 +93,31 @@ namespace monoCoopGame
 
             gameState.Step();
 
-            //if (gameState.Players.Count > 0)
-            //{
-            //    int xCenter = 0, yCenter = 0;
-            //    foreach (Character p in gameState.Players)
-            //        {
-            //            xCenter += p.Pos.X;
-            //            yCenter += p.Pos.Y;
-            //        }
-            //    xCenter /= gameState.Players.Count;
-            //    yCenter /= gameState.Players.Count;
-            //    camera.SetCenter(xCenter, yCenter);
+            if (gameState.Players.Count > 0)
+            {
+                int xCenter = 0, yCenter = 0;
+                foreach (Character p in gameState.Players)
+                {
+                    xCenter += p.Pos.X;
+                    yCenter += p.Pos.Y;
+                }
+                xCenter /= gameState.Players.Count;
+                yCenter /= gameState.Players.Count;
+                camera.SetCenter(xCenter, yCenter);
 
-            //    int xDistance = 0, yDistance = 0;
-            //    foreach (Character p in gameState.Players)
-            //        {
-            //            if (Math.Abs(p.Hitbox.Center.X - xCenter) > xDistance)
-            //                xDistance = Math.Abs(p.Pos.X - xCenter);
-            //            if (Math.Abs(p.Hitbox.Center.Y - yCenter) > yDistance)
-            //                yDistance = Math.Abs(p.Pos.Y - yCenter);
-            //        }
-            //    float xRatio = xDistance / (gameView.Width / 2f);
-            //    float yRatio = yDistance / (gameView.Height / 2f);
-            //    float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
-            //    camera.SetZoom(Math.Max(0.8f, Math.Min(2f, zoom)));
-            //}
+                int xDistance = 0, yDistance = 0;
+                foreach (Character p in gameState.Players)
+                {
+                    if (Math.Abs(p.Hitbox.Center.X - xCenter) > xDistance)
+                        xDistance = Math.Abs(p.Pos.X - xCenter);
+                    if (Math.Abs(p.Hitbox.Center.Y - yCenter) > yDistance)
+                        yDistance = Math.Abs(p.Pos.Y - yCenter);
+                }
+                float xRatio = xDistance / (gameView.Width / 2f);
+                float yRatio = yDistance / (gameView.Height / 2f);
+                float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
+                camera.SetZoom(Math.Max(graphics.IsFullScreen ? 1.7f : 1.3f, Math.Min(2f, zoom)));
+            }
 
             if (GamePad.GetState(0).Buttons.Start == ButtonState.Pressed)
             {
@@ -129,7 +128,7 @@ namespace monoCoopGame
                     graphics.PreferredBackBufferHeight = 600;
                     graphics.PreferredBackBufferWidth = 900;
                     graphics.IsFullScreen = false;
-                    camera.SetZoom(1.3f);
+                    //camera.SetZoom(1.3f);
                 }
                 else
                 {
@@ -138,7 +137,7 @@ namespace monoCoopGame
                     graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
                     graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
                     graphics.IsFullScreen = true;
-                    camera.SetZoom(1.7f);
+                    //camera.SetZoom(1.7f);
                 }
                 camera.SetView(gameView);
                 graphics.ApplyChanges();
