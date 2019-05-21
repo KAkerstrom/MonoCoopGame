@@ -8,9 +8,6 @@ namespace monoCoopGame
 {
     public class TileMap
     {
-        //public static int GridWidth = ;
-        //public static int GridWidth = ;
-
         private static Sprite waterSprite;
 
         public enum Layers
@@ -21,6 +18,7 @@ namespace monoCoopGame
         public int GridWidth, GridHeight, Width, Height;
         private Tile[][,] Tiles;
         private List<Explosion> explosions = new List<Explosion>();
+        private int grassGrowthTimer = 100;
 
         public TileMap(int width, int height)
         {
@@ -82,6 +80,7 @@ namespace monoCoopGame
 
         public void Step(GameState gameState)
         {
+            GrowGrass();
             for (int i = 1; i < GridWidth; i++)
                 for (int j = 1; j < GridHeight; j++)
                     if (Tiles[(int)Layers.Blocks][i, j] != null && Tiles[(int)Layers.Blocks][i, j] is ISteppable)
@@ -255,6 +254,30 @@ namespace monoCoopGame
         private void ExplosionDestroyed(Explosion explosion)
         {
             explosions.Remove(explosion);
+        }
+
+        private void GrowGrass()
+        {
+            if (--grassGrowthTimer == 0)
+            {
+                grassGrowthTimer = 100;
+                Point randomPoint = new Point(Utility.R.Next(0, GridWidth), Utility.R.Next(0, GridHeight));
+                if (IsTileAtGridPos(Layers.Grass, randomPoint))
+                {
+                    Point[] checks = new Point[]
+                    {
+                    new Point(randomPoint.X - 1, randomPoint.Y),
+                    new Point(randomPoint.X + 1, randomPoint.Y),
+                    new Point(randomPoint.X, randomPoint.Y - 1),
+                    new Point(randomPoint.X, randomPoint.Y + 1)
+                    };
+                    foreach (Point adjPoint in checks)
+                        if (IsGridPosInMap(adjPoint)
+                            && IsTileAtGridPos(Layers.Dirt, adjPoint)
+                            && !IsTileAtGridPos(Layers.Grass, adjPoint))
+                            AddTile(Layers.Grass, new Grass(adjPoint));
+                }
+            }
         }
     }
 }

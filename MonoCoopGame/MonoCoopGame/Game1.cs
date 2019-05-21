@@ -116,7 +116,7 @@ namespace monoCoopGame
                 float xRatio = xDistance / (gameView.Width / 2f);
                 float yRatio = yDistance / (gameView.Height / 2f);
                 float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
-                camera.SetZoom(Math.Max(graphics.IsFullScreen ? 1.7f : 1.3f, Math.Min(2f, zoom)));
+                camera.SetZoom(Math.Max(graphics.IsFullScreen ? 1.7f : 1.3f, Math.Min(2.5f, zoom)));
             }
 
             if (GamePad.GetState(0).Buttons.Start == ButtonState.Pressed)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using monoCoopGame.Tiles;
 using System.Collections.Generic;
 using System.IO;
 
@@ -49,12 +50,12 @@ namespace monoCoopGame
             Speed = 0;
         }
 
-        public void Draw(SpriteBatch spriteBatch, int x, int y, float depth)
+        public void Draw(SpriteBatch spriteBatch, int x, int y, float depth, float rotation = 0)
         {
             //spriteBatch.Draw(frames[ImageIndex], new Rectangle(x, y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height), Color.White);
 
             Rectangle drawRect = new Rectangle(x, y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height);
-            spriteBatch.Draw(frames[ImageIndex], drawRect, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, depth);
+            spriteBatch.Draw(frames[ImageIndex], drawRect, null, Color.White, rotation, new Vector2(Tile.TILE_SIZE / 2, Tile.TILE_SIZE / 2), SpriteEffects.None, depth);
         }
 
         public void Update()

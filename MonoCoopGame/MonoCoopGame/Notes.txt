@@ -1,2 +1,2 @@
 ﻿- Create a Controller class (ButtonPress etc)
-- Make Exposions stop at walls
+- Ensure zooming, gui size, etc works on all screen sizes

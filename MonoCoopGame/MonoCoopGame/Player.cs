@@ -12,6 +12,7 @@ namespace monoCoopGame
         private PlayerGUI gui;
         public Reticle Reticle { get; }
         public Inventory Inventory;
+        public int BombPower = 1;
 
         private GamePadState previousGamePadState;
 

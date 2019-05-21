@@ -6,6 +6,7 @@ namespace monoCoopGame.Tiles
     public class Tile
     {
         public const int TILE_SIZE = 16;
+        public const int INVULN_TIME = 15;
 
         public Sprite Sprite;
         public Point GridPos { get; }
@@ -14,6 +15,8 @@ namespace monoCoopGame.Tiles
         public bool IsSolid { get { return SpeedModifier == 0; } }
         public bool HasTransparency = true;
         public float Depth { get; protected set; }
+
+        private float rotation = 0;
 
         public Tile(Sprite sprite, Point gridPos)
         {
@@ -24,7 +27,18 @@ namespace monoCoopGame.Tiles
 
         public virtual void Draw(SpriteBatch spriteBatch)
         {
-            Sprite.Draw(spriteBatch, Pos.X, Pos.Y, Depth);
+            if (this is IDestroyable && ((IDestroyable)this).InvulnFrames > 0)
+            {
+                ((IDestroyable)this).InvulnFrames -= 1;
+                int invuln = ((IDestroyable)this).InvulnFrames;
+                rotation = MathHelper.Clamp(rotation + (invuln % 5 / 8f) - 0.3f, -0.5f, 0.5f);
+                Sprite.Draw(spriteBatch, Pos.X, Pos.Y, Depth, rotation);
+            }
+            else
+            {
+                rotation = 0;
+                Sprite.Draw(spriteBatch, Pos.X, Pos.Y, Depth);
+            }
         }
     }
 }

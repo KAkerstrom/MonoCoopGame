@@ -29,6 +29,16 @@ namespace monoCoopGame.Tiles
                     ((IDestroyable)explodedTile).Damage(TTL + 1, gameState, owner);
                 if (explodedTile.IsSolid)
                     TTL = 0;
+                if (((IDestroyable)explodedTile).Health <= 0)
+                {
+                    if (gameState.Map.GetTileAtGridPos(TileMap.Layers.Grass, GridPos) != null)
+                        gameState.Map.RemoveTile(TileMap.Layers.Grass, GridPos);
+                }
+            }
+            else
+            {
+                if (gameState.Map.GetTileAtGridPos(TileMap.Layers.Grass, GridPos) != null)
+                    gameState.Map.RemoveTile(TileMap.Layers.Grass, GridPos);
             }
             foreach (Player player in gameState.Players)
                 player.Damage(TTL + 1, gameState, owner);

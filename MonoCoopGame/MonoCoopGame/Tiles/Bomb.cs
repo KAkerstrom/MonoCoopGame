@@ -12,12 +12,14 @@ namespace monoCoopGame.Tiles
 
         public Player Owner { get; set; }
         public int Health { get; set; }
-        private int radius = 4;
+        public int InvulnFrames { get; set; } = 0;
+        private int radius;
 
         public Bomb(Point gridPos, Player owner) : base(new Sprite("bomb0"), gridPos)
         {
             Owner = owner;
             Health = 2;
+            radius = owner.BombPower;
             PopulateTextures();
             Sprite = new Sprite(frames, 50);
             Sprite.AnimationDone += Sprite_AnimationDone;
@@ -56,7 +58,7 @@ namespace monoCoopGame.Tiles
             TileDestroyed?.Invoke(this, player);
 
             Point point = new Point(GridPos.X, GridPos.Y);
-            Explosion explosion = new Explosion(radius , point, Owner, gameState);
+            Explosion explosion = new Explosion(radius, point, Owner, gameState);
             gameState.Map.AddExplosion(explosion);
         }
     }
