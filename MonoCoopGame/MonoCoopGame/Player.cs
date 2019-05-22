@@ -6,19 +6,28 @@ using System.Collections.Generic;
 
 namespace monoCoopGame
 {
-    public class Player : Character
+    public partial class Player : Character
     {
         public int PlayerIndex { get; set; }
         private PlayerGUI gui;
         public Reticle Reticle { get; }
         public Inventory Inventory;
         public int BombPower = 1;
-
-        private GamePadState previousGamePadState;
+        public Controller Controller { get; }
 
         public Player(int playerIndex, int x, int y, float moveSpeed) : base(x, y, moveSpeed)
         {
             PlayerIndex = playerIndex;
+            Controller = new Controller(playerIndex);
+            PopulateTextures(playerIndex);
+            sprite = sprites["walk"][Directions.South];
+            Reticle = new Reticle(this);
+            Inventory = new Inventory();
+            gui = new PlayerGUI(this);
+        }
+
+        private void PopulateTextures(int playerIndex)
+        {
             texturePrefix = "char" + (playerIndex);
             string[] actions = { "walk", "swim" };
             foreach (string act in actions)
@@ -36,10 +45,6 @@ namespace monoCoopGame
                     sprites[act].Add((Directions)dir, new Sprite(newSprite.ToArray(), 15));
                 }
             }
-            sprite = sprites["walk"][Directions.South];
-            Reticle = new Reticle(this);
-            Inventory = new Inventory();
-            gui = new PlayerGUI(this);
         }
 
         /// <summary>
@@ -48,45 +53,41 @@ namespace monoCoopGame
         /// <param name="gameState">The game state.</param>
         public override void Step(GameState gameState)
         {
+            Controller.Update();
             sprite.Update();
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex);
             TileMap map = gameState.Map;
 
             //some debug stuff
-            currentMoveSpeed = gamePadState.Buttons.A == ButtonState.Pressed ? moveSpeed * 1.5f : moveSpeed;
-            currentMoveSpeed = currentMoveSpeed - (currentMoveSpeed * gamePadState.Triggers.Left * 0.5f);
+            currentMoveSpeed = Controller.ButtonDown(Buttons.A) ? moveSpeed * 1.5f : moveSpeed;
+            currentMoveSpeed = currentMoveSpeed - (currentMoveSpeed * Controller.State.Triggers.Left * 0.5f);
 
-            if (gamePadState.IsButtonDown(Buttons.LeftShoulder) && previousGamePadState.IsButtonUp(Buttons.LeftShoulder))
+            if (Controller.ButtonPressed(Buttons.LeftShoulder))
             {
-                if (gamePadState.Triggers.Right == 0)
-                {
-                    Inventory.DecrementIndex();
-                }
-                else
+                if (Controller.ButtonDown(Buttons.RightTrigger))
                 {
                     if (map.IsTileAtGridPos(TileMap.Layers.Grass, Reticle.GridPos))
                         map.RemoveTile(TileMap.Layers.Grass, Reticle.GridPos);
                     else if (map.IsTileAtGridPos(TileMap.Layers.Dirt, Reticle.GridPos))
                         map.RemoveTile(TileMap.Layers.Dirt, Reticle.GridPos);
                 }
+                else
+                    Inventory.DecrementIndex();
             }
 
-            if (gamePadState.IsButtonDown(Buttons.RightShoulder) && previousGamePadState.IsButtonUp(Buttons.RightShoulder))
+            if (Controller.ButtonPressed(Buttons.RightShoulder))
             {
-                if (gamePadState.Triggers.Right == 0)
-                {
-                    Inventory.IncrementIndex();
-                }
-                else
+                if (Controller.ButtonDown(Buttons.RightTrigger))
                 {
                     if (!map.IsTileAtGridPos(TileMap.Layers.Dirt, Reticle.GridPos))
                         map.AddTile(TileMap.Layers.Dirt, new Dirt(Reticle.GridPos));
                     else if (!map.IsTileAtGridPos(TileMap.Layers.Grass, Reticle.GridPos))
                         map.AddTile(TileMap.Layers.Grass, new Grass(Reticle.GridPos));
                 }
+                else
+                    Inventory.IncrementIndex();
             }
 
-            if (gamePadState.IsButtonDown(Buttons.X) && previousGamePadState.IsButtonUp(Buttons.X))
+            if (Controller.ButtonPressed(Buttons.X))
                 if (map.IsTileAtGridPos(Reticle.GridPos)
                     && !gameState.Map.IsTileAtGridPos(TileMap.Layers.Blocks, Reticle.GridPos))
                     switch (Inventory.GetCurrentItem())
@@ -108,25 +109,24 @@ namespace monoCoopGame
                             break;
                     }
 
-            if (gamePadState.IsButtonDown(Buttons.A) && previousGamePadState.IsButtonUp(Buttons.A))
+            if (Controller.ButtonPressed(Buttons.A))
                 if (map.IsTileAtGridPos(Reticle.GridPos)
                         && map.GetBlockAtGridPos(Reticle.GridPos) is IUsable)
                     ((IUsable)map.GetBlockAtGridPos(Reticle.GridPos)).Use(this, gameState);
 
-            if (gamePadState.IsButtonDown(Buttons.B) && previousGamePadState.IsButtonUp(Buttons.B))
+            if (Controller.ButtonPressed(Buttons.B))
             {
                 if (gameState.Map.IsTileAtGridPos(Reticle.GridPos)
                     && map.GetBlockAtGridPos(Reticle.GridPos) is IDestroyable)
                     ((IDestroyable)gameState.Map.GetBlockAtGridPos(Reticle.GridPos)).Damage(1, gameState, this);
             }
 
-            Move(gameState, gamePadState.ThumbSticks.Left.X * currentMoveSpeed, -gamePadState.ThumbSticks.Left.Y * currentMoveSpeed);
+            Move(gameState, Controller.State.ThumbSticks.Left.X * currentMoveSpeed, -Controller.State.ThumbSticks.Left.Y * currentMoveSpeed);
             if (!gameState.Map.IsTileAtGridPos(GridPos) || gameState.Map.GetBlockAtGridPos(GridPos) is Slime)
             {
                 action = "swim";
                 sprite = sprites[action][Facing];
             }
-            previousGamePadState = gamePadState;
         }
 
         protected override void BeginDraw(SpriteBatch spriteBatch)

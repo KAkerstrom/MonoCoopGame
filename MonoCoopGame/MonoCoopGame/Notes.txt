@@ -1,2 +1,37 @@
 ﻿- Create a Controller class (ButtonPress etc)
 - Ensure zooming, gui size, etc works on all screen sizes
+
+
+
+
+
+
+
+Buttons[] buttons = new Buttons[]
+            {
+                Buttons.A,
+                Buttons.B,
+                Buttons.Back,
+                Buttons.BigButton,
+                Buttons.DPadDown,
+                Buttons.DPadLeft,
+                Buttons.DPadRight,
+                Buttons.DPadUp,
+                Buttons.LeftShoulder,
+                Buttons.LeftStick,
+                Buttons.LeftThumbstickDown,
+                Buttons.LeftThumbstickLeft,
+                Buttons.LeftThumbstickRight,
+                Buttons.LeftThumbstickUp,
+                Buttons.LeftTrigger,
+                Buttons.RightShoulder,
+                Buttons.RightStick,
+                Buttons.RightThumbstickDown,
+                Buttons.RightThumbstickLeft,
+                Buttons.RightThumbstickRight,
+                Buttons.RightThumbstickUp,
+                Buttons.RightTrigger,
+                Buttons.Start,
+                Buttons.X,
+                Buttons.Y,
+            };
