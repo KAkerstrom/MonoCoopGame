@@ -22,15 +22,16 @@ namespace monoCoopGame
         }
         public Rectangle PreviousHitbox
         {
-            get { return new Rectangle(PreviousPos.X, PreviousPos.Y, Tile.TILE_SIZE - 4, Tile.TILE_SIZE - 4); }
+            get { return new Rectangle(PreviousPos, hitboxSize); }
         }
         public Rectangle Hitbox
         {
-            get { return new Rectangle((int)x, (int)y, Tile.TILE_SIZE - 4, Tile.TILE_SIZE - 4); }
+            get { return new Rectangle(Pos, hitboxSize); }
         }
 
         protected float x, y, xPrevious, yPrevious;
         protected Sprite sprite;
+        protected Point hitboxSize = new Point(Tile.TILE_SIZE - 10, Tile.TILE_SIZE - 6);
         protected float moveSpeed;
         protected float currentMoveSpeed;
         protected string texturePrefix;
@@ -53,7 +54,8 @@ namespace monoCoopGame
         public void Draw(SpriteBatch spriteBatch)
         {
             BeginDraw(spriteBatch);
-            sprite.Draw(spriteBatch, (int)x - 2, (int)y - 2, (float)Pos.Y / (30 * Tile.TILE_SIZE)); //TODO: Change to map height variable
+            Point drawPoint = new Point((int)x - 0, (int)y - 2);
+            sprite.Draw(spriteBatch, drawPoint, (float)Pos.Y / (30 * Tile.TILE_SIZE)); //TODO: Change to map height variable
             EndDraw(spriteBatch);
         }
 

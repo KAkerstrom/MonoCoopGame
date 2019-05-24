@@ -7,7 +7,7 @@ namespace monoCoopGame.Tiles
         public event TileDestroyedDelegate TileDestroyed;
         public int Health { get; private set; }
         public int InvulnFrames { get; set; } = 0;
-        int growthTimer = 200;
+        int growthTimer = 100;
 
         public Slime(Point gridPos) : base("slime", BlobGroups.Slime, gridPos)
         {
@@ -24,8 +24,6 @@ namespace monoCoopGame.Tiles
                 Health -= damage;
                 if (Health <= 0)
                     Destroy(gameState, player);
-                if (player != null)
-                    player.Controller.Vibrate(0.2f, 200);
             }
         }
 
@@ -38,7 +36,7 @@ namespace monoCoopGame.Tiles
         {
             if (--growthTimer == 0)
             {
-                growthTimer = Utility.R.Next(100, 1000);
+                growthTimer = Utility.R.Next(100, 800);
                 Point[] checks = new Point[]
                 {
                     new Point(GridPos.X - 1, GridPos.Y),
@@ -47,7 +45,7 @@ namespace monoCoopGame.Tiles
                     new Point(GridPos.X, GridPos.Y + 1)
                 };
                 foreach (Point check in checks)
-                    if (Utility.R.Next(10) == 0
+                    if (Utility.R.Next(5) == 0
                         && gameState.Map.IsGridPosInMap(check)
                         && gameState.Map.IsTileAtGridPos(check)
                         && !gameState.Map.IsTileAtGridPos(TileMap.Layers.Blocks, check))

@@ -50,12 +50,16 @@ namespace monoCoopGame
             Speed = 0;
         }
 
-        public void Draw(SpriteBatch spriteBatch, int x, int y, float depth, float rotation = 0)
+        public void Draw(SpriteBatch spriteBatch, Point position, float depth = 0, float rotation = 0)
         {
-            //spriteBatch.Draw(frames[ImageIndex], new Rectangle(x, y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height), Color.White);
+            Rectangle drawRect = new Rectangle(position.X, position.Y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height);
+            Draw(spriteBatch, drawRect, depth, rotation);
+        }
 
-            Rectangle drawRect = new Rectangle(x, y, frames[ImageIndex].Bounds.Width, frames[ImageIndex].Bounds.Height);
-            spriteBatch.Draw(frames[ImageIndex], drawRect, null, Color.White, rotation, new Vector2(Tile.TILE_SIZE / 2, Tile.TILE_SIZE / 2), SpriteEffects.None, depth);
+        public void Draw(SpriteBatch spriteBatch, Rectangle drawRect, float depth = 0, float rotation = 0)
+        {
+            Vector2 center = new Vector2(frames[ImageIndex].Width / 2, frames[ImageIndex].Height / 2);
+            spriteBatch.Draw(frames[ImageIndex], drawRect, null, Color.White, rotation, center, SpriteEffects.None, depth);
         }
 
         public void Update()

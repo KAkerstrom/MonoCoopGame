@@ -19,14 +19,18 @@ namespace monoCoopGame
         {
             foreach (Character c in Players)
                 c.Step(this);
+            for (int i = Bullet.Bullets.Count - 1; i >= 0; i--)
+                Bullet.Bullets[i].Step(this);
             Map.Step(this);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             Map.DrawBegin(spriteBatch);
-            foreach (Character character in Players)
-                character.Draw(spriteBatch);
+            foreach (Character c in Players)
+                c.Draw(spriteBatch);
+            foreach (Bullet b in Bullet.Bullets)
+                b.Draw(spriteBatch);
             Map.DrawEnd(spriteBatch);
         }
 

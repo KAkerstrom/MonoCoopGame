@@ -69,8 +69,11 @@ namespace monoCoopGame
             Tile[,] map = Tiles[(int)layer];
             for (int i = gridPos.X - 1; i <= gridPos.X + 1; i++)
                 for (int j = gridPos.Y - 1; j <= gridPos.Y + 1; j++)
-                    if (map[i, j] != null && map[i, j] is Blob)
+                {
+                    Point checkPoint = new Point(i, j);
+                    if (IsGridPosInMap(checkPoint) &&  map[i, j] != null && map[i, j] is Blob)
                         ((Blob)map[i, j]).UpdateAdjacency(map);
+                }
         }
 
         public bool IsGridPosInMap(Point gridPos)
@@ -110,7 +113,8 @@ namespace monoCoopGame
                         {
                             if (layer < 0)
                             {
-                                waterSprite.Draw(spriteBatch, i * Tile.TILE_SIZE, j * Tile.TILE_SIZE, 0f);
+                                Point drawPoint = new Point(i * Tile.TILE_SIZE, j * Tile.TILE_SIZE);
+                                waterSprite.Draw(spriteBatch, drawPoint, 0f);
                                 goingUp = true;
                             }
                             else if (Tiles[layer][i, j] != null && !Tiles[layer][i, j].HasTransparency)

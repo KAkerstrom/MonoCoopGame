@@ -23,8 +23,6 @@ namespace monoCoopGame.Tiles
                 Health -= damage;
                 if (Health <= 0)
                     Destroy(gameState, player);
-                if (player != null)
-                    player.Controller.Vibrate(0.2f, 200);
             }
         }
 

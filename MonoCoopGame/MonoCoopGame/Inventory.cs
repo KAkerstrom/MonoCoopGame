@@ -33,6 +33,7 @@ namespace monoCoopGame
                     { "door", Sprite.GetTexture("doorWood_closed") },
                     { "bush", Sprite.GetTexture("bush") },
                     { "bomb", Sprite.GetTexture("bomb0") },
+                    { "bullet", Sprite.GetTexture("bullet") },
                 };
         }
 

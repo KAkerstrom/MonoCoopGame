@@ -32,12 +32,12 @@ namespace monoCoopGame.Tiles
                 ((IDestroyable)this).InvulnFrames -= 1;
                 int invuln = ((IDestroyable)this).InvulnFrames;
                 rotation = MathHelper.Clamp(rotation + (invuln % 5 / 8f) - 0.3f, -0.5f, 0.5f);
-                Sprite.Draw(spriteBatch, Pos.X, Pos.Y, Depth, rotation);
+                Sprite.Draw(spriteBatch, Pos, Depth, rotation);
             }
             else
             {
                 rotation = 0;
-                Sprite.Draw(spriteBatch, Pos.X, Pos.Y, Depth);
+                Sprite.Draw(spriteBatch, Pos, Depth);
             }
         }
     }

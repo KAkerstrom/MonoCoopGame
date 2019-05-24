@@ -42,7 +42,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Actions\Action.cs" />
+    <Compile Include="Actions\AttackAction.cs" />
+    <Compile Include="Actions\DecrementInventoryIndexAction.cs" />
+    <Compile Include="Actions\IncrementInventoryIndexAction.cs" />
     <Compile Include="Actions\PlaceBlockAction.cs" />
+    <Compile Include="Actions\UseAction.cs" />
+    <Compile Include="Bullet.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="Tiles\Block.cs" />

@@ -21,12 +21,13 @@ namespace monoCoopGame.Tiles
             Sprite = new Sprite(frames, 3);
             Sprite.AnimationDone += Sprite_AnimationDone;
             TTL = ttl;
+            int damage = ttl + 3;
 
             Tile explodedTile = gameState.Map.GetBlockAtGridPos(gridPos);
             if (explodedTile != null)
             {
                 if (explodedTile is IDestroyable)
-                    ((IDestroyable)explodedTile).Damage(TTL + 1, gameState, owner);
+                    ((IDestroyable)explodedTile).Damage(damage, gameState, owner);
                 if (explodedTile.IsSolid)
                     TTL = 0;
                 if (((IDestroyable)explodedTile).Health <= 0)
@@ -41,7 +42,8 @@ namespace monoCoopGame.Tiles
                     gameState.Map.RemoveTile(TileMap.Layers.Grass, GridPos);
             }
             foreach (Player player in gameState.Players)
-                player.Damage(TTL + 1, gameState, owner);
+                if (player.GridPos == GridPos)
+                    player.Damage(damage, gameState, owner);
         }
 
         private void Sprite_AnimationDone()
