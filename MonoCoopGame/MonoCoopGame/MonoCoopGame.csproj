@@ -62,6 +62,7 @@
     <Compile Include="Tiles\IOwnable.cs" />
     <Compile Include="Tiles\ISteppable.cs" />
     <Compile Include="Tiles\IUsable.cs" />
+    <Compile Include="Tiles\PushBlock.cs" />
     <Compile Include="Tiles\Slime.cs" />
     <Compile Include="Tiles\Tile.cs" />
     <Compile Include="Tiles\WallStone.cs" />

@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using monoCoopGame.Tiles;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace monoCoopGame
 {
@@ -79,10 +81,22 @@ namespace monoCoopGame
             foreach (Buttons button in buttonMap.Keys)
                 if (Controller.ButtonPressed(button))
                     buttonMap[button].Perform(gameState);
-            
+
             currentMoveSpeed = Controller.ButtonDown(Buttons.A) ? moveSpeed * 1.5f : moveSpeed;
             currentMoveSpeed = currentMoveSpeed - (currentMoveSpeed * Controller.State.Triggers.Left * 0.5f);
-            Move(gameState, Controller.State.ThumbSticks.Left.X * currentMoveSpeed, -Controller.State.ThumbSticks.Left.Y * currentMoveSpeed);
+            float xDelta = Controller.State.ThumbSticks.Left.X * currentMoveSpeed;
+            float yDelta = -Controller.State.ThumbSticks.Left.Y * currentMoveSpeed;
+            Strafe(gameState, xDelta, yDelta);
+
+            if (Controller.State.ThumbSticks.Right.X != 0 || Controller.State.ThumbSticks.Right.Y != 0)
+            {
+                float xFacing = Controller.State.ThumbSticks.Right.X;
+                float yFacing = -Controller.State.ThumbSticks.Right.Y;
+                FaceTowardDelta(xFacing, yFacing);
+            }
+            else if (xDelta != 0 || yDelta != 0)
+                FaceTowardDelta(xDelta, yDelta);
+
             if (!gameState.Map.IsTileAtGridPos(GridPos) || gameState.Map.GetBlockAtGridPos(GridPos) is Slime)
             {
                 action = "swim";

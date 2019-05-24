@@ -11,11 +11,11 @@ namespace monoCoopGame
         {
             buttonMap = new Dictionary<Buttons, Action>
             {
-                {Buttons.X, new PlaceBlockAction(this) },
+                {Buttons.RightShoulder, new PlaceBlockAction(this) },
                 {Buttons.B, new AttackAction(this) },
                 {Buttons.A, new UseAction(this) },
-                {Buttons.RightShoulder, new IncrementInventoryIndexAction(this) },
-                {Buttons.LeftShoulder, new DecrementInventoryIndexAction(this) },
+                {Buttons.Y, new IncrementInventoryIndexAction(this) },
+                {Buttons.X, new DecrementInventoryIndexAction(this) },
             };
         }
 

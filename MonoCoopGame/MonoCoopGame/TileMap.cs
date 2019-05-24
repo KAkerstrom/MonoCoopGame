@@ -200,6 +200,11 @@ namespace monoCoopGame
             return Tiles[(int)layer][gridPos.X, gridPos.Y] != null;
         }
 
+        public bool IsBlockAtGridPos(Point gridPos)
+        {
+            return Tiles[(int)Layers.Blocks][gridPos.X, gridPos.Y] != null;
+        }
+
         public bool IsTileAtGridPos(Point gridPos)
         {
             for (int i = 0; i <= (int)Layers.Blocks; i++)

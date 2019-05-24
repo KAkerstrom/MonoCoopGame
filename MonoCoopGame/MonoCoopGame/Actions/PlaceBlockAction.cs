@@ -12,7 +12,7 @@ namespace monoCoopGame
             public override void Perform(GameState gameState)
             {
                 if (gameState.Map.IsTileAtGridPos(reticle.GridPos)
-                    && !gameState.Map.IsTileAtGridPos(TileMap.Layers.Blocks, reticle.GridPos))
+                    && !gameState.Map.IsBlockAtGridPos(reticle.GridPos))
                 {
                     Tile placedTile = null;
                     switch (parent.Inventory.GetCurrentItem())
@@ -43,6 +43,9 @@ namespace monoCoopGame
                             }
                             Point bulletPos = new Point(parent.Hitbox.Center.X + xDelta, parent.Hitbox.Center.Y + yDelta);
                             new Bullet(bulletPos, parent, parent.Facing);
+                            break;
+                        case "pushBlock":
+                            placedTile = new PushBlock(reticle.GridPos);
                             break;
                     }
                     if (placedTile != null)

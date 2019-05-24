@@ -31,7 +31,7 @@ namespace monoCoopGame
 
         protected float x, y, xPrevious, yPrevious;
         protected Sprite sprite;
-        protected Point hitboxSize = new Point(Tile.TILE_SIZE - 10, Tile.TILE_SIZE - 6);
+        protected Point hitboxSize = new Point(Tile.TILE_SIZE - 4, Tile.TILE_SIZE - 4);
         protected float moveSpeed;
         protected float currentMoveSpeed;
         protected string texturePrefix;
@@ -54,7 +54,7 @@ namespace monoCoopGame
         public void Draw(SpriteBatch spriteBatch)
         {
             BeginDraw(spriteBatch);
-            Point drawPoint = new Point((int)x - 0, (int)y - 2);
+            Point drawPoint = new Point((int)x - 2, (int)y - 2);
             sprite.Draw(spriteBatch, drawPoint, (float)Pos.Y / (30 * Tile.TILE_SIZE)); //TODO: Change to map height variable
             EndDraw(spriteBatch);
         }
@@ -69,6 +69,12 @@ namespace monoCoopGame
 
         protected void Move(GameState gameState, float xDelta, float yDelta)
         {
+            Strafe(gameState, xDelta, yDelta);
+            FaceTowardDelta(xDelta, yDelta);
+        }
+
+        protected void Strafe(GameState gameState, float xDelta, float yDelta)
+        {
             float speedModifier = gameState.Map.GetSpeedModifier(Hitbox.Center);
             xDelta *= speedModifier;
             yDelta *= speedModifier;
@@ -78,37 +84,24 @@ namespace monoCoopGame
             x += xDelta;
             y += yDelta;
 
-            Directions facingPrevious = Facing;
-            if (xDelta != 0 || yDelta != 0)
+            if (GridPos != PreviousGridPos)
             {
-                if (GridPos != PreviousGridPos)
-                {
-                    if (!gameState.Map.IsTileAtGridPos(GridPos)
-                        || (gameState.Map.GetBlockAtGridPos(GridPos) != null
-                        && gameState.Map.GetBlockAtGridPos(GridPos) is Slime))
-                        action = "swim";
-                    else
-                        action = "walk";
-                    sprite = sprites[action][Facing];
-                }
-
-                sprite.Speed = 20;
-                if (Math.Abs(xDelta) > Math.Abs(yDelta))
-                    Facing = (xDelta > 0) ? Directions.East : Directions.West;
+                if (!gameState.Map.IsTileAtGridPos(GridPos)
+                    || (gameState.Map.GetBlockAtGridPos(GridPos) != null
+                    && gameState.Map.GetBlockAtGridPos(GridPos) is Slime))
+                    action = "swim";
                 else
-                    Facing = (yDelta > 0) ? Directions.South : Directions.North;
-
-                if (facingPrevious != Facing)
-                {
-                    sprite = sprites[action][Facing];
-                    sprite.ImageIndex = 0;
-                }
+                    action = "walk";
             }
-            else if (action == "walk")
+            sprite = sprites[action][Facing];
+
+            if (xDelta == 0 && yDelta == 0)
             {
                 sprite.Speed = 0;
                 sprite.ImageIndex = 1;
             }
+            else if (action == "walk")
+                sprite.Speed = 20;
 
             Point topRL, bottomRL, leftTB, rightTB;
             if (x > xPrevious)
@@ -148,6 +141,22 @@ namespace monoCoopGame
                     || (gameState.Map.IsBlockAtPos(leftTB) && gameState.Map.GetBlockAtPos(leftTB).IsSolid)
                     || (gameState.Map.IsBlockAtPos(rightTB) && gameState.Map.GetBlockAtPos(rightTB).IsSolid))
                     y = (yPrevious / Tile.TILE_SIZE) * Tile.TILE_SIZE;
+        }
+
+        protected void ChangeDirection(Directions direction)
+        {
+            Facing = direction;
+            sprite = sprites[action][Facing];
+            if (Facing != direction)
+                sprite.ImageIndex = 0;
+        }
+
+        protected void FaceTowardDelta(float xDelta, float yDelta)
+        {
+            if (Math.Abs(xDelta) > Math.Abs(yDelta))
+                ChangeDirection((xDelta > 0) ? Directions.East : Directions.West);
+            else
+                ChangeDirection((yDelta > 0) ? Directions.South : Directions.North);
         }
     }
 }
