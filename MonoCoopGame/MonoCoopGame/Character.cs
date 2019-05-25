@@ -39,9 +39,9 @@ namespace monoCoopGame
         protected Dictionary<string, Dictionary<Directions, Sprite>> sprites
             = new Dictionary<string, Dictionary<Directions, Sprite>>();
 
-        public Character(int x, int y, float moveSpeed)
+        public Character(int x, int y)
         {
-            this.moveSpeed = currentMoveSpeed = moveSpeed;
+            moveSpeed = currentMoveSpeed = 1.7f;
             this.x = xPrevious = x;
             this.y = yPrevious = y;
             Facing = Directions.South;
@@ -54,8 +54,9 @@ namespace monoCoopGame
         public void Draw(SpriteBatch spriteBatch)
         {
             BeginDraw(spriteBatch);
-            Point drawPoint = new Point((int)x - 2, (int)y - 2);
-            sprite.Draw(spriteBatch, drawPoint, (float)Pos.Y / (30 * Tile.TILE_SIZE)); //TODO: Change to map height variable
+            Rectangle drawRect = new Rectangle(Hitbox.Location, Hitbox.Size);
+            drawRect.Inflate(2, 2);
+            sprite.Draw(spriteBatch, drawRect, (float)Pos.Y / (30 * Tile.TILE_SIZE)); //TODO: Change to map height variable
             EndDraw(spriteBatch);
         }
 
@@ -84,23 +85,20 @@ namespace monoCoopGame
             x += xDelta;
             y += yDelta;
 
-            if (GridPos != PreviousGridPos)
-            {
-                if (!gameState.Map.IsTileAtGridPos(GridPos)
-                    || (gameState.Map.GetBlockAtGridPos(GridPos) != null
-                    && gameState.Map.GetBlockAtGridPos(GridPos) is Slime))
-                    action = "swim";
-                else
-                    action = "walk";
-            }
+            if (!gameState.Map.IsTileAtGridPos(GridPos)
+                || (gameState.Map.GetBlockAtGridPos(GridPos) != null
+                && gameState.Map.GetBlockAtGridPos(GridPos) is Slime))
+                action = "swim";
+            else
+                action = "walk";
             sprite = sprites[action][Facing];
 
-            if (xDelta == 0 && yDelta == 0)
+            if (xDelta == 0 && yDelta == 0 && action == "walk")
             {
                 sprite.Speed = 0;
                 sprite.ImageIndex = 1;
             }
-            else if (action == "walk")
+            else
                 sprite.Speed = 20;
 
             Point topRL, bottomRL, leftTB, rightTB;
@@ -145,18 +143,21 @@ namespace monoCoopGame
 
         protected void ChangeDirection(Directions direction)
         {
-            Facing = direction;
-            sprite = sprites[action][Facing];
             if (Facing != direction)
+            {
+                Facing = direction;
                 sprite.ImageIndex = 0;
+            }
+            sprite = sprites[action][Facing];
         }
 
         protected void FaceTowardDelta(float xDelta, float yDelta)
         {
-            if (Math.Abs(xDelta) > Math.Abs(yDelta))
-                ChangeDirection((xDelta > 0) ? Directions.East : Directions.West);
-            else
-                ChangeDirection((yDelta > 0) ? Directions.South : Directions.North);
+            if (xDelta != 0 || yDelta != 0)
+                if (Math.Abs(xDelta) > Math.Abs(yDelta))
+                    ChangeDirection((xDelta > 0) ? Directions.East : Directions.West);
+                else
+                    ChangeDirection((yDelta > 0) ? Directions.South : Directions.North);
         }
     }
 }

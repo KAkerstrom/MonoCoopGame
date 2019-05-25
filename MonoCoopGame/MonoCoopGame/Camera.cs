@@ -14,11 +14,11 @@ namespace monoCoopGame
         public Point MoveDestination { get; private set; }
         public int MoveSpeed { get; private set; }
 
-        public Camera (Viewport view, int x = 0, int y = 0, float zoom = 2f, float rotation = 0)
+        public Camera (Viewport view, int x = 0, int y = 0, float zoom = 1f, float rotation = 0)
         {
             View = view;
             CurrentPosition = MoveDestination = new Point(x, y);
-            MoveSpeed = 2;
+            MoveSpeed = 4;
             Zoom = zoom;
             Rotation = rotation;
         }

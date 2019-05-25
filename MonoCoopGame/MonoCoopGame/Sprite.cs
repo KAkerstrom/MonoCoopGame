@@ -58,7 +58,7 @@ namespace monoCoopGame
 
         public void Draw(SpriteBatch spriteBatch, Rectangle drawRect, float depth = 0, float rotation = 0)
         {
-            Vector2 center = new Vector2(frames[ImageIndex].Width / 2, frames[ImageIndex].Height / 2);
+            Vector2 center = new Vector2(drawRect.Center.X - drawRect.X, drawRect.Center.Y - drawRect.Y);
             spriteBatch.Draw(frames[ImageIndex], drawRect, null, Color.White, rotation, center, SpriteEffects.None, depth);
         }
 

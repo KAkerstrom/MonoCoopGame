@@ -5,7 +5,7 @@ namespace monoCoopGame.Tiles
 {
     public class Tile
     {
-        public const int TILE_SIZE = 16;
+        public const int TILE_SIZE = 32;
         public const int INVULN_TIME = 15;
 
         public Sprite Sprite;

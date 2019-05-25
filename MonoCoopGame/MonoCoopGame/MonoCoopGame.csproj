@@ -50,6 +50,14 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Inventory.cs" />
+    <Compile Include="InventoryItems\BombItem.cs" />
+    <Compile Include="InventoryItems\BulletItem.cs" />
+    <Compile Include="InventoryItems\BushItem.cs" />
+    <Compile Include="InventoryItems\DoorItem.cs" />
+    <Compile Include="InventoryItems\InventoryItem.cs" />
+    <Compile Include="InventoryItems\PushBlockItem.cs" />
+    <Compile Include="InventoryItems\SlimeItem.cs" />
+    <Compile Include="InventoryItems\WallItem.cs" />
     <Compile Include="Tiles\Block.cs" />
     <Compile Include="Tiles\Bomb.cs" />
     <Compile Include="Tiles\Bush.cs" />

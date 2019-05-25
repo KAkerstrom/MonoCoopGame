@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monoCoopGame.Tiles;
 
 namespace monoCoopGame
 {
@@ -61,14 +62,14 @@ namespace monoCoopGame
 
             TileMap map = new TileMap(40, 24);
             gameState = new GameState(map, new List<Player>());
-            camera = new Camera(gameView, 20 * 16, 12 * 16);
+            camera = new Camera(gameView, 20 * Tile.TILE_SIZE, 12 * Tile.TILE_SIZE, 0.65f);
             playerManager = new PlayerManager();
             playerManager.PlayerConnected += PlayerManager_PlayerConnected;
         }
 
         private void PlayerManager_PlayerConnected(int playerIndex)
         {
-            Player testPlayer = new Player(playerIndex, 15 * 16, 10 * 16, 1);
+            Player testPlayer = new Player(playerIndex, 20 * Tile.TILE_SIZE, 12 * Tile.TILE_SIZE);
             gameState.Players.Add(testPlayer);
         }
 
@@ -115,8 +116,8 @@ namespace monoCoopGame
                 }
                 float xRatio = xDistance / (gameView.Width / 2f);
                 float yRatio = yDistance / (gameView.Height / 2f);
-                float zoom = 0.6f / MathHelper.Max(xRatio, yRatio);
-                camera.SetZoom(Math.Max(graphics.IsFullScreen ? 1.7f : 1.3f, Math.Min(2.5f, zoom)));
+                float zoom = 0.3f / MathHelper.Max(xRatio, yRatio);
+                camera.SetZoom(Math.Max(graphics.IsFullScreen ? 0.85f : 0.65f, Math.Min(1.25f, zoom)));
             }
 
             if (GamePad.GetState(0).Buttons.Start == ButtonState.Pressed)

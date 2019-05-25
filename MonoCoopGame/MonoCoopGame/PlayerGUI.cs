@@ -21,7 +21,7 @@ namespace monoCoopGame
             DrawBackground(spriteBatch);
             player.Inventory.Draw(spriteBatch, new Rectangle(drawArea.X + 16, drawArea.Y + 48, 32 * 5, 32));
             spriteBatch.DrawString(Utility.Fonts["playerGUI"], $"Player {player.PlayerIndex + 1} ({player.Health})", new Vector2(drawArea.X + 64, drawArea.Y + 16), Color.Black);
-            Rectangle playerSpriteRect = new Rectangle(drawArea.X + 16, drawArea.Y + 8, Tile.TILE_SIZE * 2, Tile.TILE_SIZE * 2);
+            Rectangle playerSpriteRect = new Rectangle(drawArea.X + 16, drawArea.Y + 8, 16 * 2, 16 * 2);
             spriteBatch.Draw(Sprite.GetTexture("char" + player.PlayerIndex + "_walk_s_0"), playerSpriteRect, Color.White);
         }
 
@@ -34,10 +34,7 @@ namespace monoCoopGame
             spriteBatch.Draw(Sprite.GetTexture("ui0_se"), new Vector2(drawArea.Right - uiGridSize, drawArea.Bottom - uiGridSize), Color.White);
 
             for (int i = 0; i < (drawArea.Width / uiGridSize); i++)
-            {
-                spriteBatch.Draw(Sprite.GetTexture("ui0_n"), new Vector2(drawArea.X + (i * uiGridSize), drawArea.Y), Color.White);
                 spriteBatch.Draw(Sprite.GetTexture("ui0_s"), new Vector2(drawArea.X + (i * uiGridSize), drawArea.Bottom - uiGridSize), Color.White);
-            }
 
             for (int i = 0; i < (drawArea.Height / uiGridSize); i++)
             {
@@ -46,7 +43,7 @@ namespace monoCoopGame
             }
 
             for (int i = 1; i < (drawArea.Width / uiGridSize); i++)
-                for (int j = 1; j < (drawArea.Height / uiGridSize); j++)
+                for (int j = 0; j < (drawArea.Height / uiGridSize); j++)
                     spriteBatch.Draw(Sprite.GetTexture("ui0_"), new Vector2(drawArea.X + (i * uiGridSize), drawArea.Y + (j * uiGridSize)), Color.White);
         }
     }

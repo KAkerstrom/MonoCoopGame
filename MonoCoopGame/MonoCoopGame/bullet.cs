@@ -15,7 +15,7 @@ namespace monoCoopGame
         public Player Owner;
         private Directions direction;
         private float rotation;
-        private int speed = 5;
+        private int speed = 10;
         private int damage = 2;
 
         public Bullet(Point position, Player owner, Directions direction)
@@ -87,8 +87,8 @@ namespace monoCoopGame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            Point drawPoint = new Point(Pos.X - (Sprite.Width / 2), Pos.Y - (Sprite.Height / 2));
-            Sprite.Draw(spriteBatch, drawPoint, 0f, rotation);
+            Rectangle drawRect = new Rectangle(Pos.X - Tile.TILE_SIZE / 2, Pos.Y - Tile.TILE_SIZE / 2, Tile.TILE_SIZE, Tile.TILE_SIZE);
+            Sprite.Draw(spriteBatch, drawRect, 0f, rotation);
         }
     }
 }

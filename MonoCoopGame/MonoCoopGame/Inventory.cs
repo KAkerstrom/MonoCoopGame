@@ -2,80 +2,70 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using monoCoopGame.InventoryItems;
+using System.Reflection;
+using System.Linq;
 
 namespace monoCoopGame
 {
-    public class Inventory
+    public partial class Inventory
     {
-        private static Dictionary<string, Texture2D> textures;
-
         private int index = 0;
-        private List<string> inventory = new List<string>();
-        private Dictionary<string, int> items = new Dictionary<string, int>();
+        private List<InventoryItem> inventory;
 
         public Inventory()
         {
-            PopulateTextures();
-            foreach (string item in textures.Keys)
+            inventory = new List<InventoryItem>
             {
-                inventory.Add(item);
-                items.Add(item, 100);
-            }
+                new BombItem(9999),
+                new BushItem(9999),
+                new WallItem(9999),
+                new SlimeItem(9999),
+                new PushBlockItem(9999),
+                new BulletItem(9999),
+                new DoorItem(9999),
+            };
         }
 
-        public static void PopulateTextures()
+        public void AddItem(InventoryItem item)
         {
-            if (textures == null)
-                textures = new Dictionary<string, Texture2D>
-                {
-                    { "wallStone", Sprite.GetTexture("wallStone") },
-                    { "slime", Sprite.GetTexture("slime_news") },
-                    { "door", Sprite.GetTexture("doorWood_closed") },
-                    { "bush", Sprite.GetTexture("bush") },
-                    { "bomb", Sprite.GetTexture("bomb0") },
-                    { "bullet", Sprite.GetTexture("bullet") },
-                    { "pushBlock", Sprite.GetTexture("barrel") },
-                };
-        }
-
-        public void AddItem(string item, int quantity)
-        {
-            if (quantity <= 0)
+            if (item.Quantity <= 0)
                 throw new Exception("Cannot add less than 1 item to inventory.");
 
-            if (inventory.Contains(item))
-                items[item] += quantity;
+            InventoryItem foundItem = inventory.Find(x => x.Name == item.Name);
+            if (foundItem != null)
+                foundItem.Quantity += item.Quantity;
             else
             {
                 inventory.Add(item);
-                items.Add(item, quantity);
             }
         }
 
-        public void DepleteItem(string item, int quantity)
+        public void DepleteItem(string itemName, int quantity)
         {
             if (quantity <= 0)
-                throw new System.Exception("Cannot deplete less than 1 item from inventory.");
+                throw new Exception("Cannot deplete less than 1 item from inventory.");
 
-            if (inventory.Contains(item))
+            InventoryItem foundItem = inventory.Find(x => x.Name == itemName);
+            if (foundItem != null)
             {
-                items[item] -= quantity;
-                if (items[item] <= 0)
-                    RemoveAll(item);
+                foundItem.Quantity -= quantity;
+                if (foundItem.Quantity <= 0)
+                    RemoveAll(itemName);
             }
 
         }
 
-        public void RemoveAll(string item)
+        public void RemoveAll(string itemName)
         {
-            int itemIndex = inventory.IndexOf(item);
+            InventoryItem foundItem = inventory.Find(x => x.Name == itemName);
+            int itemIndex = inventory.IndexOf(foundItem);
             if (index > itemIndex)
                 index--;
             if (index >= inventory.Count)
                 index = 0;
 
-            inventory.Remove(item);
-            items.Remove(item);
+            inventory.Remove(foundItem);
         }
 
         public void IncrementIndex()
@@ -90,14 +80,11 @@ namespace monoCoopGame
                 index = inventory.Count - 1;
         }
 
-        public string GetCurrentItem()
+        public InventoryItem GetCurrentItem()
         {
-            // Probably better to either have a Place method in the items,
-            // or have a seperate set of classes for inventory items?
             if (inventory.Count > 0)
                 return inventory[index];
-            else
-                return string.Empty;
+            return null;
         }
 
         public void Draw(SpriteBatch spriteBatch, Rectangle drawArea)
@@ -105,13 +92,12 @@ namespace monoCoopGame
             int width = drawArea.Width / 5;
             int height = drawArea.Height;
             for (int i = 2; i >= 0; i--)
-                for (int j = -1; j <= 1; j += 2) // A bit jank, but it works
+                for (int j = -1; j <= 1; j += 2)
                 {
                     int itemIndex = (index + (i * j)) % (inventory.Count);
                     if (itemIndex < 0)
                         itemIndex = inventory.Count + itemIndex;
 
-                    string itemName = inventory[itemIndex];
                     Rectangle itemRect = new Rectangle(drawArea.X + (i * j + 2) * width, drawArea.Y, width, height);
 
                     if (i == 0)
@@ -121,7 +107,7 @@ namespace monoCoopGame
                         itemRect = new Rectangle(itemRect.X - wider, itemRect.Y - taller, itemRect.Width + wider * 2, itemRect.Height + taller * 2);
                     }
 
-                    spriteBatch.Draw(textures[itemName], itemRect, Color.White * (1f / (i + 1)));
+                    spriteBatch.Draw(inventory[itemIndex].Texture, itemRect, Color.White * (1f / (i + 1)));
                 }
         }
     }

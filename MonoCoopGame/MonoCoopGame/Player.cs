@@ -1,8 +1,6 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using monoCoopGame.Tiles;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -15,9 +13,10 @@ namespace monoCoopGame
         public Reticle Reticle { get; }
         public Inventory Inventory;
         public int BombPower = 2;
+        public int Speed = 2;
         public Controller Controller { get; }
 
-        public Player(int playerIndex, int x, int y, float moveSpeed) : base(x, y, moveSpeed)
+        public Player(int playerIndex, int x, int y) : base(x, y)
         {
             PlayerIndex = playerIndex;
             Controller = new Controller(playerIndex);
@@ -60,6 +59,23 @@ namespace monoCoopGame
             sprite.Update();
             TileMap map = gameState.Map;
 
+            DebugControls(gameState);
+            foreach (Buttons button in buttonMap.Keys)
+                if (Controller.ButtonPressed(button))
+                    buttonMap[button].Perform(gameState);
+
+            currentMoveSpeed = Controller.ButtonDown(Buttons.A) ? moveSpeed * 1.5f : moveSpeed;
+            float xDelta = Controller.State.ThumbSticks.Left.X * currentMoveSpeed;
+            float yDelta = -Controller.State.ThumbSticks.Left.Y * currentMoveSpeed;
+            if (!Controller.ButtonDown(Buttons.LeftTrigger))
+                FaceTowardDelta(xDelta, yDelta);
+            Strafe(gameState, xDelta, yDelta);
+        }
+
+        [Conditional("DEBUG")]
+        private void DebugControls(GameState gameState)
+        {
+            TileMap map = gameState.Map;
             if (Controller.ButtonPressed(Buttons.LeftShoulder))
                 if (Controller.ButtonDown(Buttons.RightTrigger))
                 {
@@ -77,37 +93,12 @@ namespace monoCoopGame
                     else if (!map.IsTileAtGridPos(TileMap.Layers.Grass, Reticle.GridPos))
                         map.AddTile(TileMap.Layers.Grass, new Grass(Reticle.GridPos));
                 }
-
-            foreach (Buttons button in buttonMap.Keys)
-                if (Controller.ButtonPressed(button))
-                    buttonMap[button].Perform(gameState);
-
-            currentMoveSpeed = Controller.ButtonDown(Buttons.A) ? moveSpeed * 1.5f : moveSpeed;
-            currentMoveSpeed = currentMoveSpeed - (currentMoveSpeed * Controller.State.Triggers.Left * 0.5f);
-            float xDelta = Controller.State.ThumbSticks.Left.X * currentMoveSpeed;
-            float yDelta = -Controller.State.ThumbSticks.Left.Y * currentMoveSpeed;
-            Strafe(gameState, xDelta, yDelta);
-
-            if (Controller.State.ThumbSticks.Right.X != 0 || Controller.State.ThumbSticks.Right.Y != 0)
-            {
-                float xFacing = Controller.State.ThumbSticks.Right.X;
-                float yFacing = -Controller.State.ThumbSticks.Right.Y;
-                FaceTowardDelta(xFacing, yFacing);
-            }
-            else if (xDelta != 0 || yDelta != 0)
-                FaceTowardDelta(xDelta, yDelta);
-
-            if (!gameState.Map.IsTileAtGridPos(GridPos) || gameState.Map.GetBlockAtGridPos(GridPos) is Slime)
-            {
-                action = "swim";
-                sprite = sprites[action][Facing];
-            }
         }
 
         protected override void BeginDraw(SpriteBatch spriteBatch)
         {
             GamePadState gamePadState = GamePad.GetState(PlayerIndex);
-            Reticle.Draw(spriteBatch, gamePadState.Triggers.Left);
+            Reticle.Draw(spriteBatch, gamePadState.Triggers.Right);
         }
 
         protected override void EndDraw(SpriteBatch spriteBatch)
