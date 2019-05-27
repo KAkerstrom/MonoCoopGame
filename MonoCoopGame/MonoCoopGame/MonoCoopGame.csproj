@@ -59,6 +59,7 @@
     <Compile Include="InventoryItems\PushBlockItem.cs" />
     <Compile Include="InventoryItems\SlimeItem.cs" />
     <Compile Include="InventoryItems\WallItem.cs" />
+    <Compile Include="PauseState.cs" />
     <Compile Include="State.cs" />
     <Compile Include="Tiles\Block.cs" />
     <Compile Include="Tiles\Bomb.cs" />

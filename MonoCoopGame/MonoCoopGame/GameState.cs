@@ -38,8 +38,14 @@ namespace monoCoopGame
 
         public override void Step()
         {
-            foreach (Character c in Players)
-                c.Step(this);
+            foreach (Player p in Players)
+            {
+                p.Step(this);
+                if (p.Controller.ButtonPressed(Buttons.Start))
+                {
+                    CurrentState = new PauseState(graphics, p.Controller, this);
+                }
+            }
             for (int i = Entities.Count - 1; i >= 0; i--)
                 Entities[i].Step(this);
             Map.Step(this);

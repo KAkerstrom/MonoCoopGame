@@ -19,6 +19,7 @@ namespace monoCoopGame
             get => currentState;
             set
             {
+                value.graphics.Viewport = new Viewport(value.graphics.PresentationParameters.Bounds);
                 currentState = value;
                 StateChanged?.Invoke(value);
             }
