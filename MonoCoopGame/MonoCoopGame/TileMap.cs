@@ -17,7 +17,6 @@ namespace monoCoopGame
 
         public int GridWidth, GridHeight, Width, Height;
         private Tile[][,] Tiles;
-        private List<Explosion> explosions = new List<Explosion>();
         private int grassGrowthTimer = 100;
 
         public TileMap(int width, int height)
@@ -71,7 +70,7 @@ namespace monoCoopGame
                 for (int j = gridPos.Y - 1; j <= gridPos.Y + 1; j++)
                 {
                     Point checkPoint = new Point(i, j);
-                    if (IsGridPosInMap(checkPoint) &&  map[i, j] != null && map[i, j] is Blob)
+                    if (IsGridPosInMap(checkPoint) && map[i, j] != null && map[i, j] is Blob)
                         ((Blob)map[i, j]).UpdateAdjacency(map);
                 }
         }
@@ -88,12 +87,9 @@ namespace monoCoopGame
                 for (int j = 1; j < GridHeight; j++)
                     if (Tiles[(int)Layers.Blocks][i, j] != null && Tiles[(int)Layers.Blocks][i, j] is ISteppable)
                         ((ISteppable)Tiles[(int)Layers.Blocks][i, j]).Step(gameState);
-
-            for (int i = explosions.Count - 1; i >= 0; i--)
-                explosions[i].Step(gameState);
         }
 
-        public void DrawBegin(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             for (int i = 1; i < GridWidth; i++)
                 for (int j = 1; j < GridHeight; j++)
@@ -126,12 +122,6 @@ namespace monoCoopGame
                         layer += goingUp ? 1 : -1;
                     }
                 }
-        }
-
-        public void DrawEnd(SpriteBatch spriteBatch)
-        {
-            foreach (Explosion explosion in explosions)
-                explosion.Draw(spriteBatch);
         }
 
         public void AddTile(Tile tile)
@@ -241,28 +231,6 @@ namespace monoCoopGame
                 if (Tiles[i][gridPos.X, gridPos.Y] != null)
                     speedMod = Tiles[i][gridPos.X, gridPos.Y].SpeedModifier;
             return speedMod;
-        }
-
-        public void AddExplosion(Explosion explosion)
-        {
-            if (IsGridPosInMap(explosion.GridPos))
-            {
-                explosions.Add(explosion);
-                explosion.ExplosionDestroyed += ExplosionDestroyed;
-            }
-        }
-
-        public bool IsExplosionAtGridPos(Point gridPos)
-        {
-            foreach (Explosion explosion in explosions)
-                if (explosion.GridPos == gridPos)
-                    return true;
-            return false;
-        }
-
-        private void ExplosionDestroyed(Explosion explosion)
-        {
-            explosions.Remove(explosion);
         }
 
         private void GrowGrass()

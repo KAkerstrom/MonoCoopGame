@@ -58,8 +58,8 @@ namespace monoCoopGame.Tiles
             TileDestroyed?.Invoke(this, player);
 
             Point point = new Point(GridPos.X, GridPos.Y);
-            Explosion explosion = new Explosion(radius, point, Owner, gameState);
-            gameState.Map.AddExplosion(explosion);
+            Explosion explosion = new Explosion(Utility.R.Next(), radius, point, Owner, gameState);
+            gameState.AddEntity(explosion);
         }
     }
 }

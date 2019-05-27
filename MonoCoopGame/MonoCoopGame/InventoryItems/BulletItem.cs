@@ -18,7 +18,8 @@ namespace monoCoopGame.InventoryItems
                 case Directions.South: yDelta = Tile.TILE_SIZE; break;
             }
             Point bulletPos = new Point(player.Hitbox.Center.X + xDelta, player.Hitbox.Center.Y + yDelta);
-            new Bullet(bulletPos, player, player.Facing);
+            Bullet newBullet = new Bullet(bulletPos, player, player.Facing);
+            gameState.Entities.Add(newBullet);
         }
     }
 }

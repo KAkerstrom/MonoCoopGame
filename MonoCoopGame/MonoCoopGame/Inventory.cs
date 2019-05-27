@@ -62,8 +62,8 @@ namespace monoCoopGame
             int itemIndex = inventory.IndexOf(foundItem);
             if (index > itemIndex)
                 index--;
-            if (index >= inventory.Count)
-                index = 0;
+            //if (index >= inventory.Count)
+            //    index = 0;
 
             inventory.Remove(foundItem);
         }

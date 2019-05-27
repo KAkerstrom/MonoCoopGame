@@ -1,14 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using monoCoopGame.Tiles;
-using System.Collections.Generic;
 
 namespace monoCoopGame
 {
-    class Bullet
+    class Bullet : IEntity
     {
         private static Sprite Sprite;
-        public static List<Bullet> Bullets = new List<Bullet>();
+        public event EntityDestroyedDelegate EntityDestroyed;
 
         public Point Pos { get; private set; }
         public Point GridPos { get { return new Point(Pos.X / Tile.TILE_SIZE, Pos.Y / Tile.TILE_SIZE); } }
@@ -31,8 +30,6 @@ namespace monoCoopGame
                 case Directions.South: rotation = 3.14159f; break;
             }
             PopulateTextures();
-
-            Bullets.Add(this);
         }
 
         private static void PopulateTextures()
@@ -82,7 +79,7 @@ namespace monoCoopGame
 
         public void Destroy(GameState gameState)
         {
-            Bullets.Remove(this);
+            EntityDestroyed?.Invoke(this);
         }
 
         public void Draw(SpriteBatch spriteBatch)

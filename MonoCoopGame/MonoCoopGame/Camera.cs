@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,7 +15,7 @@ namespace monoCoopGame
         public Point MoveDestination { get; private set; }
         public int MoveSpeed { get; private set; }
 
-        public Camera (Viewport view, int x = 0, int y = 0, float zoom = 1f, float rotation = 0)
+        public Camera(Viewport view, int x = 0, int y = 0, float zoom = 1f, float rotation = 0)
         {
             View = view;
             CurrentPosition = MoveDestination = new Point(x, y);
@@ -35,6 +36,32 @@ namespace monoCoopGame
         public void SetCenter(int x, int y)
         {
             MoveDestination = new Point(x, y);
+        }
+
+        public void UpdateGameCamera(List<Point> playerPositions)
+        {
+            int xCenter = 0, yCenter = 0;
+            foreach (Point p in playerPositions)
+            {
+                xCenter += p.X;
+                yCenter += p.Y;
+            }
+            xCenter /= playerPositions.Count;
+            yCenter /= playerPositions.Count;
+            SetCenter(xCenter, yCenter);
+
+            int xDistance = 0, yDistance = 0;
+            foreach (Point p in playerPositions)
+            {
+                if (Math.Abs(p.X - xCenter) > xDistance)
+                    xDistance = Math.Abs(p.X - xCenter);
+                if (Math.Abs(p.Y - yCenter) > yDistance)
+                    yDistance = Math.Abs(p.Y - yCenter);
+            }
+            float xRatio = xDistance / (View.Width / 2f);
+            float yRatio = yDistance / (View.Height / 2f);
+            float zoom = 0.3f / MathHelper.Max(xRatio, yRatio);
+            SetZoom(Math.Max(0.85f, Math.Min(1.25f, zoom)));
         }
 
         public void SetZoom(float zoom)

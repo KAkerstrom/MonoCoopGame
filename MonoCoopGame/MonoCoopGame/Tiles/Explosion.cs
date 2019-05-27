@@ -1,21 +1,24 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace monoCoopGame.Tiles
 {
-    public delegate void ExplosionDestroyedDelegate(Explosion explosion);
-
-    public class Explosion : Tile, ISteppable, IOwnable
+    public class Explosion : Tile, ISteppable, IOwnable, IEntity
     {
-        public event ExplosionDestroyedDelegate ExplosionDestroyed;
+        public event EntityDestroyedDelegate EntityDestroyed;
+
         private static Texture2D[] frames;
         public Player Owner { get; set; }
 
         private int TTL;
+        private int id;
         private bool propogated = false;
 
-        public Explosion(int ttl, Point gridPos, Player owner, GameState gameState) : base(null, gridPos)
+        public Explosion(int id, int ttl, Point gridPos, Player owner, GameState gameState) : base(null, gridPos)
         {
+            this.id = id;
             GetSprite();
             Owner = owner;
             Sprite = new Sprite(frames, 3);
@@ -48,7 +51,7 @@ namespace monoCoopGame.Tiles
 
         private void Sprite_AnimationDone()
         {
-            ExplosionDestroyed?.Invoke(this);
+            EntityDestroyed?.Invoke(this);
         }
 
         public void Step(GameState gameState)
@@ -64,9 +67,20 @@ namespace monoCoopGame.Tiles
                     new Point(GridPos.X, GridPos.Y - 1),
                     new Point(GridPos.X, GridPos.Y + 1)
                 };
+                List<IEntity> explosions = gameState.Entities.FindAll(x => x is Explosion);
                 foreach (Point check in propogations)
-                    if (!gameState.Map.IsExplosionAtGridPos(check))
-                        gameState.Map.AddExplosion(new Explosion(TTL - 1, check, Owner, gameState));
+                    if (gameState.Map.IsGridPosInMap(GridPos))
+                    {
+                        bool canPlace = true;
+                        foreach (IEntity entity in explosions)
+                            if (entity.GridPos == check && ((Explosion)entity).id == id)
+                            {
+                                canPlace = false;
+                                break;
+                            }
+                        if (canPlace)
+                            gameState.AddEntity(new Explosion(id, TTL - 1, check, Owner, gameState));
+                    }
             }
         }
 
