@@ -45,10 +45,11 @@
     <Compile Include="Actions\AttackAction.cs" />
     <Compile Include="Actions\DecrementInventoryIndexAction.cs" />
     <Compile Include="Actions\IncrementInventoryIndexAction.cs" />
-    <Compile Include="Actions\PlaceBlockAction.cs" />
+    <Compile Include="Actions\UseBlockAction.cs" />
     <Compile Include="Actions\UseAction.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="Controller.cs" />
+    <Compile Include="ExitState.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="InventoryItems\BombItem.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="InventoryItems\InventoryItem.cs" />
     <Compile Include="InventoryItems\PushBlockItem.cs" />
     <Compile Include="InventoryItems\SlimeItem.cs" />
+    <Compile Include="InventoryItems\ShovelItem.cs" />
     <Compile Include="InventoryItems\WallItem.cs" />
     <Compile Include="PauseState.cs" />
     <Compile Include="State.cs" />

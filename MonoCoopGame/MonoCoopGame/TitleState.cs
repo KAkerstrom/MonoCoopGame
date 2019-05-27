@@ -57,7 +57,7 @@ namespace monoCoopGame
 
         private void ExitItem_MenuItemActivated(MenuItem item)
         {
-            QuitGame();
+            CurrentState = new ExitState(graphics, controller, this);
         }
 
         public override void Draw()

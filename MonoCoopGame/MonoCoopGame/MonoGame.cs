@@ -19,6 +19,7 @@ namespace monoCoopGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            Window.Title = "Mono Coop Game";
 
             graphics.PreferredBackBufferHeight = 600;
             graphics.PreferredBackBufferWidth = 900;
@@ -48,6 +49,7 @@ namespace monoCoopGame
             Sprite.LoadSprites(Content, "img");
             Utility.Fonts.Add("playerGUI", Content.Load<SpriteFont>("playerGUI"));
             Utility.Fonts.Add("blocks", Content.Load<SpriteFont>("Fonts/blocks"));
+            Utility.Fonts.Add("quantityFont", Content.Load<SpriteFont>("Fonts/quantityFont"));
 
             state = new TitleState(GraphicsDevice);
             State.CurrentState = state;

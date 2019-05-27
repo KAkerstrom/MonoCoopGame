@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace monoCoopGame
 {
@@ -37,7 +38,6 @@ namespace monoCoopGame
                 }
             }
         }
-
 
         protected SpriteBatch spriteBatch;
         protected GraphicsDevice graphics;

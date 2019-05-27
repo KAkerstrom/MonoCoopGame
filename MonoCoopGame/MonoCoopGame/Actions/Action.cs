@@ -11,7 +11,7 @@ namespace monoCoopGame
         {
             buttonMap = new Dictionary<Buttons, Action>
             {
-                {Buttons.X, new PlaceBlockAction(this) },
+                {Buttons.X, new UseBlockAction(this) },
                 {Buttons.B, new AttackAction(this) },
                 {Buttons.A, new UseAction(this) },
                 {Buttons.RightShoulder, new IncrementInventoryIndexAction(this) },

@@ -7,25 +7,23 @@ using System.Collections.Generic;
 
 namespace monoCoopGame
 {
-    public class PauseState : State
+    public class ExitState : State
     {
         private Menu menu;
         private Controller controller;
-        private State gameState;
-        private Texture2D background;
+        private State previousState;
 
-        public PauseState(GraphicsDevice graphics, Controller controller, State gameState, Texture2D background) : base(graphics)
+        public ExitState(GraphicsDevice graphics, Controller controller, State previousState) : base(graphics)
         {
-            this.gameState = gameState;
+            this.previousState = previousState;
             this.controller = controller;
-            this.background = background;
-            TitleMenuItem resumeItem = new TitleMenuItem("Resume");
-            TitleMenuItem exitItem = new TitleMenuItem("Exit");
+            TitleMenuItem ExitItem = new TitleMenuItem("Yes");
+            TitleMenuItem CancelItem = new TitleMenuItem("No");
 
             List<MenuItem> menuItems = new List<MenuItem>
             {
-                resumeItem,
-                exitItem
+                ExitItem,
+                CancelItem
             };
             int xPos = graphics.PresentationParameters.Bounds.X + 50;
             int yPos = graphics.PresentationParameters.Bounds.Height / 3;
@@ -34,28 +32,27 @@ namespace monoCoopGame
             Rectangle menuBounds = new Rectangle(xPos, yPos, xSize, ySize);
             menu = new Menu(menuBounds, menuItems);
 
-            resumeItem.MenuItemActivated += ResumeItem_MenuItemActivated;
-            exitItem.MenuItemActivated += ExitItem_MenuItemActivated;
-        }
-
-        private void ResumeItem_MenuItemActivated(MenuItem item)
-        {
-            CurrentState = gameState;
+            ExitItem.MenuItemActivated += ExitItem_MenuItemActivated;
+            CancelItem.MenuItemActivated += CancelItem_MenuItemActivated;
         }
 
         private void ExitItem_MenuItemActivated(MenuItem item)
         {
-            CurrentState = new ExitState(graphics, controller, this);
+            QuitGame();
+        }
+
+        private void CancelItem_MenuItemActivated(MenuItem item)
+        {
+            CurrentState = previousState;
         }
 
         public override void Draw()
         {
             graphics.Clear(new Color(99, 197, 207));
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
-            spriteBatch.Draw(background, graphics.PresentationParameters.Bounds, Color.White);
 
             SpriteFont font = Utility.Fonts["blocks"];
-            string pauseString = "GAME PAUSED";
+            string pauseString = "Are you sure you\nwant to exit?";
             int xPosition = (int)((graphics.PresentationParameters.Bounds.Width - font.MeasureString(pauseString).X) / 2);
             int yPosition = (int)((graphics.PresentationParameters.Bounds.Height / 4 - font.MeasureString(pauseString).Y) / 2);
             Vector2 pauseStringPoint = new Vector2(xPosition, yPosition);
@@ -68,17 +65,10 @@ namespace monoCoopGame
         public override void Step()
         {
             controller.Update();
-            if (controller.ButtonPressed(Buttons.Start))
-                ResumeItem_MenuItemActivated(null);
             if (controller.ButtonPressed(Buttons.A))
                 menu.ActivateItem();
             if (controller.ButtonPressed(Buttons.B))
-            {
-                if (menu.Index == 0)
-                    menu.ActivateItem();
-                else
-                    menu.SetIndex(0);
-            }
+                CancelItem_MenuItemActivated(null);
             if (controller.State.ThumbSticks.Left.Y > 0.5f
                 && controller.PreviousState.ThumbSticks.Left.Y <= 0.5f)
                 menu.DecrementIndex(false);

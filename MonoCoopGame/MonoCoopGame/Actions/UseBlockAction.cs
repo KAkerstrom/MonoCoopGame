@@ -6,13 +6,14 @@ namespace monoCoopGame
 {
     public partial class Player : Character
     {
-        class PlaceBlockAction : Action
+        class UseBlockAction : Action
         {
-            public PlaceBlockAction(Player parent) : base(parent) { }
+            public UseBlockAction(Player parent) : base(parent) { }
 
             public override void Perform(GameState gameState)
             {
                 InventoryItem item = parent.Inventory.GetCurrentItem();
+                parent.Inventory.DepleteItem(item.Name, 1);
                 item.Use(gameState, parent);
             }
         }

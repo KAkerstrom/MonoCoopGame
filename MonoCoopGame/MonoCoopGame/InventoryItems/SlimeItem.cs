@@ -4,7 +4,7 @@ namespace monoCoopGame.InventoryItems
 {
     public class SlimeItem : InventoryItem
     {
-        public SlimeItem(int quantity) : base("Slime", "slime_", quantity) { }
+        public SlimeItem(int quantity) : base("Slime", "slime_news", quantity) { }
 
         public override void Use(GameState gameState, Player player)
         {

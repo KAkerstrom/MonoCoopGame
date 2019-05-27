@@ -76,14 +76,6 @@ namespace monoCoopGame
         private void DebugControls(GameState gameState)
         {
             TileMap map = gameState.Map;
-            if (Controller.ButtonPressed(Buttons.LeftShoulder))
-                if (Controller.ButtonDown(Buttons.RightTrigger))
-                {
-                    if (map.IsTileAtGridPos(TileMap.Layers.Grass, Reticle.GridPos))
-                        map.RemoveTile(TileMap.Layers.Grass, Reticle.GridPos);
-                    else if (map.IsTileAtGridPos(TileMap.Layers.Dirt, Reticle.GridPos))
-                        map.RemoveTile(TileMap.Layers.Dirt, Reticle.GridPos);
-                }
 
             if (Controller.ButtonPressed(Buttons.RightShoulder))
                 if (Controller.ButtonDown(Buttons.RightTrigger))

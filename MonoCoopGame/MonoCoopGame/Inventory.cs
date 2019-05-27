@@ -24,6 +24,7 @@ namespace monoCoopGame
                 new PushBlockItem(9999),
                 new BulletItem(9999),
                 new DoorItem(9999),
+                new ShovelItem(9999),
             };
         }
 
@@ -108,6 +109,12 @@ namespace monoCoopGame
                     }
 
                     spriteBatch.Draw(inventory[itemIndex].Texture, itemRect, Color.White * (1f / (i + 1)));
+
+                    if (i == 0)
+                    {
+                        Vector2 drawPoint = new Vector2(itemRect.Location.X, itemRect.Bottom - 10);
+                        spriteBatch.DrawString(Utility.Fonts["quantityFont"], inventory[itemIndex].Quantity.ToString(), drawPoint, Color.Black);
+                    }
                 }
         }
     }

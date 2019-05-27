@@ -10,7 +10,7 @@ namespace monoCoopGame.Tiles
         private bool isOpen = false;
         private bool isLiminal = false;
 
-        public Door(Point gridPos) : base(new Sprite("doorWood"), gridPos)
+        public Door(Point gridPos) : base(new Sprite("doorWood_closed"), gridPos)
         {
             HasTransparency = true;
             Health = 10;
