@@ -42,9 +42,7 @@ namespace monoCoopGame
             {
                 p.Step(this);
                 if (p.Controller.ButtonPressed(Buttons.Start))
-                {
-                    CurrentState = new PauseState(graphics, p.Controller, this);
-                }
+                    Pause(p.Controller);
             }
             for (int i = Entities.Count - 1; i >= 0; i--)
                 Entities[i].Step(this);
@@ -68,6 +66,28 @@ namespace monoCoopGame
             }
             UpdateCamera();
             camera.MoveTowardDestination();
+        }
+
+        private void Pause(Controller controller)
+        {
+            int w, h;
+            w = graphics.PresentationParameters.BackBufferWidth;
+            h = graphics.PresentationParameters.BackBufferHeight;
+            RenderTarget2D screenshot;
+            screenshot = new RenderTarget2D(graphics, w, h, false, SurfaceFormat.Bgra32, DepthFormat.None);
+            graphics.SetRenderTarget(screenshot);
+            graphics.Clear(new Color(99, 197, 207));
+            graphics.Viewport = gameView;
+            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, camera.Transform);
+            DrawGame(spriteBatch);
+            spriteBatch.End();
+            graphics.SetRenderTarget(null);
+            Texture2D pauseBackground = new Texture2D(graphics, screenshot.Width, screenshot.Height);
+            Color[] texdata = new Color[screenshot.Width * screenshot.Height];
+            screenshot.GetData(texdata);
+            pauseBackground.SetData(texdata);
+
+            CurrentState = new PauseState(graphics, controller, this, pauseBackground);
         }
 
         public override void Draw()

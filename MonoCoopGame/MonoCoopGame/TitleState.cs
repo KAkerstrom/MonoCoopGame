@@ -11,6 +11,7 @@ namespace monoCoopGame
     {
         private Menu menu;
         private Controller controller;
+        private GameState gameState;
 
         public TitleState(GraphicsDevice graphics) : base(graphics)
         {
@@ -34,12 +35,14 @@ namespace monoCoopGame
             settingsItem.MenuItemActivated += SettingsItem_MenuItemActivated;
             aboutItem.MenuItemActivated += AboutItem_MenuItemActivated;
             exitItem.MenuItemActivated += ExitItem_MenuItemActivated;
+
+            TileMap map = new TileMap(40, 24);
+            gameState = new GameState(graphics, map, new List<Player>());
         }
 
         private void PlayItem_MenuItemActivated(MenuItem item)
         {
-            TileMap map = new TileMap(40, 24);
-            CurrentState = new GameState(graphics, map, new List<Player>());
+            CurrentState = gameState;
         }
 
         private void SettingsItem_MenuItemActivated(MenuItem item)

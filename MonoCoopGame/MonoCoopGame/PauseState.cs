@@ -12,11 +12,13 @@ namespace monoCoopGame
         private Menu menu;
         private Controller controller;
         private State gameState;
+        private Texture2D background;
 
-        public PauseState(GraphicsDevice graphics, Controller controller, State gameState) : base(graphics)
+        public PauseState(GraphicsDevice graphics, Controller controller, State gameState, Texture2D background) : base(graphics)
         {
             this.gameState = gameState;
             this.controller = controller;
+            this.background = background;
             TitleMenuItem resumeItem = new TitleMenuItem("Resume");
             TitleMenuItem exitItem = new TitleMenuItem("Exit");
 
@@ -50,6 +52,7 @@ namespace monoCoopGame
         {
             graphics.Clear(new Color(99, 197, 207));
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
+            spriteBatch.Draw(background, graphics.PresentationParameters.Bounds, Color.White);
 
             SpriteFont font = Utility.Fonts["blocks"];
             string pauseString = "GAME PAUSED";
@@ -65,6 +68,8 @@ namespace monoCoopGame
         public override void Step()
         {
             controller.Update();
+            if (controller.ButtonPressed(Buttons.Start))
+                ResumeItem_MenuItemActivated(null);
             if (controller.ButtonPressed(Buttons.A))
                 menu.ActivateItem();
             if (controller.State.ThumbSticks.Left.Y > 0.5f
