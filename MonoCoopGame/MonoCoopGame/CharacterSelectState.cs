@@ -6,13 +6,13 @@ using System.Collections.Generic;
 
 namespace monoCoopGame
 {
-    public class TitleState : State
+    public class CharacterSelectState : State
     {
         private Menu menu;
         private Controller controller;
         private GameState gameState;
 
-        public TitleState(GraphicsDevice graphics) : base(graphics)
+        public CharacterSelectState(GraphicsDevice graphics) : base(graphics)
         {
             TitleMenuItem playItem = new TitleMenuItem("Play");
             TitleMenuItem settingsItem = new TitleMenuItem("Settings");
