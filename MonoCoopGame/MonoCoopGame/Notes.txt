@@ -7,3 +7,5 @@
 - Draw Inventory quantities
 - Create Character creation screen
 - Manage controllers better (Don't rely only on the order they're connected)
+- Add comments & documentation
+- Change how explosions propogate - save points already blown up & check against that list?

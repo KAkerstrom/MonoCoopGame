@@ -57,11 +57,14 @@
     <Compile Include="InventoryItems\BushItem.cs" />
     <Compile Include="InventoryItems\DoorItem.cs" />
     <Compile Include="InventoryItems\InventoryItem.cs" />
+    <Compile Include="InventoryItems\MineItem.cs" />
     <Compile Include="InventoryItems\PushBlockItem.cs" />
     <Compile Include="InventoryItems\SlimeItem.cs" />
     <Compile Include="InventoryItems\ShovelItem.cs" />
     <Compile Include="InventoryItems\WallItem.cs" />
     <Compile Include="PauseState.cs" />
+    <Compile Include="Powerups\BombRadiusPowerup.cs" />
+    <Compile Include="Powerups\Powerup.cs" />
     <Compile Include="State.cs" />
     <Compile Include="Tiles\Block.cs" />
     <Compile Include="Tiles\Bomb.cs" />
@@ -75,6 +78,7 @@
     <Compile Include="Tiles\IOwnable.cs" />
     <Compile Include="Tiles\ISteppable.cs" />
     <Compile Include="Tiles\IUsable.cs" />
+    <Compile Include="Tiles\Mine.cs" />
     <Compile Include="Tiles\PushBlock.cs" />
     <Compile Include="Tiles\Slime.cs" />
     <Compile Include="Tiles\Tile.cs" />

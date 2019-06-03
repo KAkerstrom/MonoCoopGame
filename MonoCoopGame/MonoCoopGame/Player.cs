@@ -12,7 +12,7 @@ namespace monoCoopGame
         private PlayerGUI gui;
         public Reticle Reticle { get; }
         public Inventory Inventory;
-        public int BombPower = 2;
+        public int BombPower = 1;
         public int Speed = 2;
         public Controller Controller { get; }
 

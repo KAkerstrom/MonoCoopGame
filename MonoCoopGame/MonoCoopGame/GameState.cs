@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monoCoopGame.Powerups;
 using monoCoopGame.Tiles;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,13 @@ namespace monoCoopGame
 
         public override void Step()
         {
+            if (Utility.R.Next(50) == 0)
+            {
+                Point randomPoint = new Point(Utility.R.Next(0, Map.GridWidth), Utility.R.Next(0, Map.GridHeight));
+                IEntity radiusPower = new BombRadiusPowerup(randomPoint);
+                AddEntity(radiusPower);
+            }
+
             foreach (Player p in Players)
             {
                 p.Step(this);

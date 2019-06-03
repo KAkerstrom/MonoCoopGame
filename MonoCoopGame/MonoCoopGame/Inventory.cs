@@ -25,6 +25,7 @@ namespace monoCoopGame
                 new BulletItem(9999),
                 new DoorItem(9999),
                 new ShovelItem(9999),
+                new MineItem(9999),
             };
         }
 

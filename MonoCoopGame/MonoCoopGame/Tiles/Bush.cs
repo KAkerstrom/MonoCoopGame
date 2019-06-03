@@ -12,7 +12,7 @@ namespace monoCoopGame.Tiles
         {
             HasTransparency = true;
             SpeedModifier = 0;
-            Health = 3;
+            Health = 5;
         }
 
         public void Damage(int damage, GameState gameState, Player player = null)
@@ -23,6 +23,8 @@ namespace monoCoopGame.Tiles
                 Health -= damage;
                 if (Health <= 0)
                     Destroy(gameState, player);
+                else if (Health <= 2)
+                    Sprite = new Sprite("trunk");
             }
         }
 

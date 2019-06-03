@@ -88,9 +88,14 @@ namespace monoCoopGame.Tiles
         {
             if (frames == null)
             {
-                frames = new Texture2D[4];
+                frames = new Texture2D[8];
                 for (int i = 0; i < 4; i++)
                     frames[i] = Sprite.GetTexture("explosion" + i);
+                // Jank, but this prolongs the animation to avoid an issue with
+                // explosions looping in on themselves.
+                // Should eventually fix this properly, but this will do for now
+                for (int i = 0; i < 4; i++)
+                    frames[i + 4] = Sprite.GetTexture("null");
             }
         }
     }
