@@ -16,11 +16,11 @@ namespace monoCoopGame
         public int Speed = 2;
         public Controller Controller { get; }
 
-        public Player(int playerIndex, int x, int y) : base(x, y)
+        public Player(int playerIndex, int controllerIndex, int characterIndex, int x, int y) : base(x, y)
         {
             PlayerIndex = playerIndex;
-            Controller = new Controller(playerIndex);
-            PopulateTextures(playerIndex);
+            Controller = new Controller(controllerIndex);
+            PopulateTextures(characterIndex);
             SetDefaultButtonMap(); // Action.cs
             sprite = sprites["walk"][Directions.South];
             Reticle = new Reticle(this);
@@ -89,8 +89,7 @@ namespace monoCoopGame
 
         protected override void BeginDraw(SpriteBatch spriteBatch)
         {
-            GamePadState gamePadState = GamePad.GetState(PlayerIndex);
-            Reticle.Draw(spriteBatch, gamePadState.Triggers.Right);
+            Reticle.Draw(spriteBatch, Controller.State.Triggers.Right);
         }
 
         protected override void EndDraw(SpriteBatch spriteBatch)

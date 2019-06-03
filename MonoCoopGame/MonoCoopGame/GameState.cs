@@ -33,7 +33,7 @@ namespace monoCoopGame
 
         private void PlayerManager_PlayerConnected(int playerIndex)
         {
-            Player testPlayer = new Player(playerIndex, 20 * Tile.TILE_SIZE, 12 * Tile.TILE_SIZE);
+            Player testPlayer = new Player(playerIndex, playerIndex, playerIndex, 20 * Tile.TILE_SIZE, 12 * Tile.TILE_SIZE);
             Players.Add(testPlayer);
         }
 

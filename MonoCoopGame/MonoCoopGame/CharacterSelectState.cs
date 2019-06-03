@@ -25,7 +25,7 @@ namespace monoCoopGame
                         menuSize.X,
                         menuSize.Y
                     );
-                menus[i] = new CharacterSelectMenu(bounds);
+                menus[i] = new CharacterSelectMenu(i, bounds);
             }
 
             playerManager = new PlayerManager();
