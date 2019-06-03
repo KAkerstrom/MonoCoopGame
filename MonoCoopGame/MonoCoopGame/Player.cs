@@ -28,9 +28,9 @@ namespace monoCoopGame
             gui = new PlayerGUI(this);
         }
 
-        private void PopulateTextures(int playerIndex)
+        private void PopulateTextures(int characterIndex)
         {
-            texturePrefix = "char" + (playerIndex);
+            texturePrefix = "char" + (characterIndex);
             string[] actions = { "walk", "swim" };
             foreach (string act in actions)
             {

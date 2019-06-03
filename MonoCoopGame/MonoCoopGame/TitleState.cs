@@ -41,7 +41,8 @@ namespace monoCoopGame
 
         private void PlayItem_MenuItemActivated(MenuItem item)
         {
-            CurrentState = gameState;
+            CurrentState = new CharacterSelectState(graphics);
+            //CurrentState = gameState;
         }
 
         private void SettingsItem_MenuItemActivated(MenuItem item)

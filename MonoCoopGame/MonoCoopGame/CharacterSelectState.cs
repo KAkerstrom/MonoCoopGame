@@ -8,86 +8,71 @@ namespace monoCoopGame
 {
     public class CharacterSelectState : State
     {
-        private Menu menu;
-        private Controller controller;
+        private CharacterSelectMenu[] menus = new CharacterSelectMenu[4];
         private GameState gameState;
+        private List<Controller> controllers = new List<Controller>();
+        private PlayerManager playerManager;
 
         public CharacterSelectState(GraphicsDevice graphics) : base(graphics)
         {
-            TitleMenuItem playItem = new TitleMenuItem("Play");
-            TitleMenuItem settingsItem = new TitleMenuItem("Settings");
-            TitleMenuItem aboutItem = new TitleMenuItem("About");
-            TitleMenuItem exitItem = new TitleMenuItem("Exit");
-
-            List<MenuItem> menuItems = new List<MenuItem>
+            Point menuSize = new Point(graphics.PresentationParameters.Bounds.Width / 2, graphics.PresentationParameters.Bounds.Height / 2);
+            for (int i = 0; i < 4; i++)
             {
-                playItem,
-                settingsItem,
-                aboutItem,
-                exitItem
-            };
-            Rectangle menuBounds = graphics.PresentationParameters.Bounds;
-            menuBounds.Inflate(-50, -50);
-            menu = new Menu(menuBounds, menuItems);
+                Rectangle bounds = new Rectangle
+                    (
+                        (i % 2) * menuSize.X,
+                        (i / 2) * menuSize.Y,
+                        menuSize.X,
+                        menuSize.Y
+                    );
+                menus[i] = new CharacterSelectMenu(bounds);
+            }
 
-            playItem.MenuItemActivated += PlayItem_MenuItemActivated;
-            settingsItem.MenuItemActivated += SettingsItem_MenuItemActivated;
-            aboutItem.MenuItemActivated += AboutItem_MenuItemActivated;
-            exitItem.MenuItemActivated += ExitItem_MenuItemActivated;
+            playerManager = new PlayerManager();
+            playerManager.PlayerConnected += PlayerConnected;
 
             TileMap map = new TileMap(40, 24);
             gameState = new GameState(graphics, map, new List<Player>());
         }
 
-        private void PlayItem_MenuItemActivated(MenuItem item)
+        private void PlayerConnected(int playerIndex)
         {
-            CurrentState = gameState;
-        }
-
-        private void SettingsItem_MenuItemActivated(MenuItem item)
-        {
-
-        }
-
-        private void AboutItem_MenuItemActivated(MenuItem item)
-        {
-
-        }
-
-        private void ExitItem_MenuItemActivated(MenuItem item)
-        {
-            CurrentState = new ExitState(graphics, controller, this);
+            controllers.Add(new Controller(playerIndex));
         }
 
         public override void Draw()
         {
             graphics.Clear(new Color(99, 197, 207));
-
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
-
-            menu.Draw(spriteBatch);
-
+            foreach (CharacterSelectMenu menu in menus)
+                menu.Draw(spriteBatch);
             spriteBatch.End();
         }
 
         public override void Step()
         {
-            if (controller == null)
+            foreach (Controller c in controllers)
             {
-                for (int i = 0; i < GamePad.MaximumGamePadCount; i++)
-                    if (GamePad.GetState(i).IsConnected)
-                        controller = new Controller(i);
-                return;
+                bool unassigned = true;
+                foreach (CharacterSelectMenu menu in menus)
+                    if (menu.Active && menu.controllerIndex == c.PlayerIndex)
+                        unassigned = false;
+
+                if (unassigned)
+                {
+                    c.Update();
+                    if (c.ButtonPressed(Buttons.Start))
+                        for (int i = 0; i < 4; i++)
+                            if (!menus[i].Active)
+                            {
+                                menus[i].Activate(c.PlayerIndex);
+                                break;
+                            }
+                }
             }
-            controller.Update();
-            if (controller.ButtonPressed(Buttons.A))
-                menu.ActivateItem();
-            if (controller.State.ThumbSticks.Left.Y > 0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y <= 0.5f)
-                menu.DecrementIndex(false);
-            if (controller.State.ThumbSticks.Left.Y < -0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y >= -0.5f)
-                menu.IncrementIndex(false);
+
+            foreach (CharacterSelectMenu menu in menus)
+                menu.Step();
         }
     }
 }
