@@ -48,6 +48,7 @@
     <Compile Include="Actions\UseBlockAction.cs" />
     <Compile Include="Actions\UseAction.cs" />
     <Compile Include="Bullet.cs" />
+    <Compile Include="CharacterSelectState.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="ExitState.cs" />
     <Compile Include="IEntity.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Reticle.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="TitleState.cs" />
+    <Compile Include="UI\CharacterSelectMenu.cs" />
     <Compile Include="UI\Menu.cs" />
     <Compile Include="UI\MenuItem.cs" />
     <Compile Include="UI\TitleMenuItem.cs" />

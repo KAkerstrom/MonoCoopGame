@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using monoCoopGame.UI;
-using System;
 using System.Collections.Generic;
 
 namespace monoCoopGame
@@ -42,7 +41,8 @@ namespace monoCoopGame
 
         private void PlayItem_MenuItemActivated(MenuItem item)
         {
-            CurrentState = gameState;
+            CurrentState = new CharacterSelectState(graphics);
+            //CurrentState = gameState;
         }
 
         private void SettingsItem_MenuItemActivated(MenuItem item)
