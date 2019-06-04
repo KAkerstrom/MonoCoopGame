@@ -13,6 +13,7 @@ namespace monoCoopGame
         public static event StateChangedDelegate StateChanged;
 
         private static bool isFullScreen;
+        private static State previousState;
         private static State currentState;
 
         public static State CurrentState
@@ -21,6 +22,7 @@ namespace monoCoopGame
             set
             {
                 value.graphics.Viewport = new Viewport(value.graphics.PresentationParameters.Bounds);
+                previousState = currentState;
                 currentState = value;
                 StateChanged?.Invoke(value);
             }

@@ -23,8 +23,8 @@ namespace monoCoopGame
         {
             Map = map;
             Players = players;
-            playerManager = new PlayerManager();
-            playerManager.PlayerConnected += PlayerManager_PlayerConnected;
+            //playerManager = new PlayerManager();
+            //playerManager.PlayerConnected += PlayerManager_PlayerConnected;
 
             playerGuiView = new Viewport(0, 0, 900, 100);
             gameView = new Viewport(0, 100, 900, 500);
@@ -33,8 +33,6 @@ namespace monoCoopGame
 
         private void PlayerManager_PlayerConnected(int playerIndex)
         {
-            Player testPlayer = new Player(playerIndex, playerIndex, playerIndex, 20 * Tile.TILE_SIZE, 12 * Tile.TILE_SIZE);
-            Players.Add(testPlayer);
         }
 
         public override void Step()

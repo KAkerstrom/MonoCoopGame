@@ -9,6 +9,7 @@ namespace monoCoopGame
     public partial class Player : Character
     {
         public int PlayerIndex { get; set; }
+        public string Name { get; private set; }
         private PlayerGUI gui;
         public Reticle Reticle { get; }
         public Inventory Inventory;
@@ -16,37 +17,16 @@ namespace monoCoopGame
         public int Speed = 2;
         public Controller Controller { get; }
 
-        public Player(int playerIndex, int controllerIndex, int characterIndex, int x, int y) : base(x, y)
+        public Player(string playerName, int playerIndex, int controllerIndex, int characterIndex, Inventory playerInventory, int x, int y) : base(x, y, characterIndex)
         {
             PlayerIndex = playerIndex;
+            Name = playerName;
             Controller = new Controller(controllerIndex);
-            PopulateTextures(characterIndex);
             SetDefaultButtonMap(); // Action.cs
             sprite = sprites["walk"][Directions.South];
             Reticle = new Reticle(this);
-            Inventory = new Inventory();
+            Inventory = playerInventory;
             gui = new PlayerGUI(this);
-        }
-
-        private void PopulateTextures(int characterIndex)
-        {
-            texturePrefix = "char" + (characterIndex);
-            string[] actions = { "walk", "swim" };
-            foreach (string act in actions)
-            {
-                if (!sprites.ContainsKey(act))
-                    sprites.Add(act, new Dictionary<Directions, Sprite>());
-
-                for (int dir = 0; dir < 4; dir++)
-                {
-                    List<Texture2D> newSprite = new List<Texture2D>();
-                    string textureName = $"{texturePrefix}_{act}_" + "news"[dir] + "_";
-                    int index = 0;
-                    while (Sprite.TextureExists(textureName + index))
-                        newSprite.Add(Sprite.GetTexture(textureName + index++));
-                    sprites[act].Add((Directions)dir, new Sprite(newSprite.ToArray(), 15));
-                }
-            }
         }
 
         /// <summary>

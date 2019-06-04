@@ -28,6 +28,7 @@ namespace monoCoopGame
         {
             get { return new Rectangle(Pos, hitboxSize); }
         }
+        public int CharacterIndex { get; }
 
         protected float x, y, xPrevious, yPrevious;
         protected Sprite sprite;
@@ -39,7 +40,7 @@ namespace monoCoopGame
         protected Dictionary<string, Dictionary<Directions, Sprite>> sprites
             = new Dictionary<string, Dictionary<Directions, Sprite>>();
 
-        public Character(int x, int y)
+        public Character(int x, int y, int characterIndex)
         {
             moveSpeed = currentMoveSpeed = 1.7f;
             this.x = xPrevious = x;
@@ -47,6 +48,29 @@ namespace monoCoopGame
             Facing = Directions.South;
             action = "walk";
             Health = 50;
+            PopulateTextures(characterIndex);
+            CharacterIndex = characterIndex;
+        }
+
+        private void PopulateTextures(int characterIndex)
+        {
+            texturePrefix = "char" + (characterIndex);
+            string[] actions = { "walk", "swim" };
+            foreach (string act in actions)
+            {
+                if (!sprites.ContainsKey(act))
+                    sprites.Add(act, new Dictionary<Directions, Sprite>());
+
+                for (int dir = 0; dir < 4; dir++)
+                {
+                    List<Texture2D> newSprite = new List<Texture2D>();
+                    string textureName = $"{texturePrefix}_{act}_" + "news"[dir] + "_";
+                    int index = 0;
+                    while (Sprite.TextureExists(textureName + index))
+                        newSprite.Add(Sprite.GetTexture(textureName + index++));
+                    sprites[act].Add((Directions)dir, new Sprite(newSprite.ToArray(), 15));
+                }
+            }
         }
 
         public abstract void Step(GameState gameState);

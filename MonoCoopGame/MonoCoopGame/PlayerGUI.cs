@@ -20,9 +20,9 @@ namespace monoCoopGame
         {
             DrawBackground(spriteBatch);
             player.Inventory.Draw(spriteBatch, new Rectangle(drawArea.X + 16, drawArea.Y + 48, 32 * 5, 32));
-            spriteBatch.DrawString(Utility.Fonts["playerGUI"], $"Player {player.PlayerIndex + 1} ({player.Health})", new Vector2(drawArea.X + 64, drawArea.Y + 16), Color.Black);
+            spriteBatch.DrawString(Utility.Fonts["playerGUI"], $"{player.Name} ({player.Health})", new Vector2(drawArea.X + 64, drawArea.Y + 16), Color.Black);
             Rectangle playerSpriteRect = new Rectangle(drawArea.X + 16, drawArea.Y + 8, 16 * 2, 16 * 2);
-            spriteBatch.Draw(Sprite.GetTexture("char" + player.PlayerIndex + "_walk_s_0"), playerSpriteRect, Color.White);
+            spriteBatch.Draw(Sprite.GetTexture("char" + player.CharacterIndex + "_walk_s_0"), playerSpriteRect, Color.White);
         }
 
         private void DrawBackground(SpriteBatch spriteBatch)

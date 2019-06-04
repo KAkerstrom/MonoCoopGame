@@ -51,6 +51,7 @@
     <Compile Include="CharacterSelectState.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="ExitState.cs" />
+    <Compile Include="GamepadController.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="Inventory.cs" />
     <Compile Include="InventoryItems\BombItem.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="UI\CharacterSelectMenu.cs" />
     <Compile Include="UI\Menu.cs" />
     <Compile Include="UI\MenuItem.cs" />
+    <Compile Include="UI\TextEntry.cs" />
     <Compile Include="UI\TitleMenuItem.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>

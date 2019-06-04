@@ -9,9 +9,10 @@ namespace monoCoopGame
     public class CharacterSelectState : State
     {
         private CharacterSelectMenu[] menus = new CharacterSelectMenu[4];
-        private GameState gameState;
         private List<Controller> controllers = new List<Controller>();
         private PlayerManager playerManager;
+        private GameState gameState;
+        private int gameStartTimer = 0;
 
         public CharacterSelectState(GraphicsDevice graphics) : base(graphics)
         {
@@ -40,6 +41,20 @@ namespace monoCoopGame
             controllers.Add(new Controller(playerIndex));
         }
 
+        private bool AllPlayersReady()
+        {
+            bool atLeastOneActive = false;
+            foreach (CharacterSelectMenu menu in menus)
+                if (menu.Active)
+                {
+                    if (menu.Ready)
+                        atLeastOneActive = true;
+                    else
+                        return false;
+                }
+            return atLeastOneActive;
+        }
+
         public override void Draw()
         {
             graphics.Clear(new Color(99, 197, 207));
@@ -51,6 +66,16 @@ namespace monoCoopGame
 
         public override void Step()
         {
+            if (AllPlayersReady())
+            {
+                List<Player> players = new List<Player>();
+                foreach (CharacterSelectMenu menu in menus)
+                    if (menu.Active)
+                        players.Add(menu.CreatePlayer());
+                gameState.Players = players;
+                CurrentState = gameState;
+            }
+
             foreach (Controller c in controllers)
             {
                 bool unassigned = true;

@@ -1,11 +1,11 @@
 ﻿- Ensure zooming, gui size, etc works on all screen sizes
 - Check for memory leaks etc
 - Make sure States are either disposed properly, or made Static
-- Put States in their own folder
+- Put States in their own folder?
 - Consider completely restructuring into separate projects or something
 - Draw Healthbar
-- Draw Inventory quantities
-- Create Character creation screen
-- Manage controllers better (Don't rely only on the order they're connected)
 - Add comments & documentation
 - Change how explosions propogate - save points already blown up & check against that list?
+
+- Placing blocks deplete the item even if it doen't get placed - Fix this!
+- Put a cap on the number of explosions (that can overlap)
