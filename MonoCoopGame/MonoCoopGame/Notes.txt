@@ -5,7 +5,10 @@
 - Consider completely restructuring into separate projects or something
 - Draw Healthbar
 - Add comments & documentation
-- Change how explosions propogate - save points already blown up & check against that list?
+- Change how explosions propogate?
 
 - Placing blocks deplete the item even if it doen't get placed - Fix this!
 - Put a cap on the number of explosions (that can overlap)
+- Add a method that is called when a State is moved into CurrentState
+- Move controllers to static state list
+- Fix issues with character sprites not resetting when changing direction etc

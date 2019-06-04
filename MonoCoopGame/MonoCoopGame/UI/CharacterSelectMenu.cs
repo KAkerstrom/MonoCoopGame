@@ -28,7 +28,7 @@ namespace monoCoopGame.UI
         private TextEntry nameEntry;
         private SubMenuItems currentItem = SubMenuItems.Character;
 
-        private Controller controller;
+        private IController controller;
 
         public CharacterSelectMenu(int index, Rectangle drawBounds)
         {
@@ -50,7 +50,7 @@ namespace monoCoopGame.UI
                 (
                     nameEntry.Text,
                     playerIndex,
-                    controller.PlayerIndex,
+                    controller.ControllerIndex,
                     character,
                     sellInventory,
                     20 * Tile.TILE_SIZE,
@@ -62,7 +62,7 @@ namespace monoCoopGame.UI
         {
             State = MenuStates.Selection;
             this.controllerIndex = controllerIndex;
-            controller = new Controller(controllerIndex);
+            controller = ControllerFactory.GetController(controllerIndex);
         }
 
         public void Deactivate()
@@ -100,16 +100,16 @@ namespace monoCoopGame.UI
             {
                 if (currentItem > SubMenuItems.Name)
                     if (controller.ButtonPressed(Buttons.DPadDown)
-                        || (controller.State.ThumbSticks.Left.Y < -0.5
-                            && controller.PreviousState.ThumbSticks.Left.Y >= -0.5))
+                        || (controller.LeftStick.Y < -0.5
+                            && controller.PreviousLeftStick.Y >= -0.5))
                     {
                         int itemIndex = (int)currentItem;
                         if (++itemIndex <= (int)SubMenuItems.Ready)
                             currentItem = (SubMenuItems)itemIndex;
                     }
                     else if (controller.ButtonPressed(Buttons.DPadUp)
-                        || (controller.State.ThumbSticks.Left.Y > 0.5
-                            && controller.PreviousState.ThumbSticks.Left.Y <= 0.5))
+                        || (controller.LeftStick.Y > 0.5
+                            && controller.PreviousLeftStick.Y <= 0.5))
                     {
                         int itemIndex = (int)currentItem;
                         if (--itemIndex >= (int)SubMenuItems.Character)
@@ -123,12 +123,12 @@ namespace monoCoopGame.UI
                             if (++character > 5)
                                 character = 0;
                         if (controller.ButtonPressed(Buttons.DPadRight)
-                            || (controller.State.ThumbSticks.Left.X > 0.5
-                                && controller.PreviousState.ThumbSticks.Left.X <= 0.5))
+                            || (controller.LeftStick.X > 0.5
+                                && controller.PreviousLeftStick.X <= 0.5))
                             currentItem = SubMenuItems.Name;
                         else if (controller.ButtonPressed(Buttons.DPadDown)
-                            || (controller.State.ThumbSticks.Left.Y < -0.5
-                                && controller.PreviousState.ThumbSticks.Left.Y >= -0.5))
+                            || (controller.LeftStick.Y < -0.5
+                                && controller.PreviousLeftStick.Y >= -0.5))
                             currentItem = SubMenuItems.Buy;
                         break;
 
@@ -136,34 +136,34 @@ namespace monoCoopGame.UI
                         if (controller.ButtonPressed(Buttons.A))
                             nameEntry.Activate(controller);
                         if (controller.ButtonPressed(Buttons.DPadLeft)
-                            || (controller.State.ThumbSticks.Left.X < -0.5
-                                && controller.PreviousState.ThumbSticks.Left.X >= -0.5))
+                            || (controller.LeftStick.X < -0.5
+                                && controller.PreviousLeftStick.X >= -0.5))
                             currentItem = SubMenuItems.Character;
                         else if (controller.ButtonPressed(Buttons.DPadDown)
-                            || (controller.State.ThumbSticks.Left.Y < -0.5
-                                && controller.PreviousState.ThumbSticks.Left.Y >= -0.5))
+                            || (controller.LeftStick.Y < -0.5
+                                && controller.PreviousLeftStick.Y >= -0.5))
                             currentItem = SubMenuItems.Buy;
                         break;
 
                     case SubMenuItems.Buy:
                         if (controller.ButtonPressed(Buttons.DPadRight)
-                        || (controller.State.ThumbSticks.Left.X > 0.2
-                            && controller.PreviousState.ThumbSticks.Left.X <= 0.2))
+                        || (controller.LeftStick.X > 0.2
+                            && controller.PreviousLeftStick.X <= 0.2))
                             buyInventory.IncrementIndex();
                         else if (controller.ButtonPressed(Buttons.DPadLeft)
-                        || (controller.State.ThumbSticks.Left.X < -0.2
-                            && controller.PreviousState.ThumbSticks.Left.X >= -0.2))
+                        || (controller.LeftStick.X < -0.2
+                            && controller.PreviousLeftStick.X >= -0.2))
                             buyInventory.DecrementIndex();
                         break;
 
                     case SubMenuItems.Sell:
                         if (controller.ButtonPressed(Buttons.DPadRight)
-                        || (controller.State.ThumbSticks.Left.X > 0.2
-                            && controller.PreviousState.ThumbSticks.Left.X <= 0.2))
+                        || (controller.LeftStick.X > 0.2
+                            && controller.PreviousLeftStick.X <= 0.2))
                             sellInventory.IncrementIndex();
                         else if (controller.ButtonPressed(Buttons.DPadLeft)
-                        || (controller.State.ThumbSticks.Left.X < -0.2
-                            && controller.PreviousState.ThumbSticks.Left.X >= -0.2))
+                        || (controller.LeftStick.X < -0.2
+                            && controller.PreviousLeftStick.X >= -0.2))
                             sellInventory.DecrementIndex();
                         break;
 

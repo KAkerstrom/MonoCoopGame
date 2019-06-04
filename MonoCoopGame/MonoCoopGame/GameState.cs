@@ -74,7 +74,7 @@ namespace monoCoopGame
             camera.MoveTowardDestination();
         }
 
-        private void Pause(Controller controller)
+        private void Pause(IController controller)
         {
             int w, h;
             w = graphics.PresentationParameters.BackBufferWidth;

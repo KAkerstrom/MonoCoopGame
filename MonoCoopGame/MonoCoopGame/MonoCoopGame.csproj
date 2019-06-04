@@ -49,7 +49,8 @@
     <Compile Include="Actions\UseAction.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="CharacterSelectState.cs" />
-    <Compile Include="Controller.cs" />
+    <Compile Include="IController.cs" />
+    <Compile Include="ControllerFactory.cs" />
     <Compile Include="ExitState.cs" />
     <Compile Include="GamepadController.cs" />
     <Compile Include="IEntity.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="InventoryItems\SlimeItem.cs" />
     <Compile Include="InventoryItems\ShovelItem.cs" />
     <Compile Include="InventoryItems\WallItem.cs" />
+    <Compile Include="KeyboardController.cs" />
     <Compile Include="PauseState.cs" />
     <Compile Include="Powerups\BombRadiusPowerup.cs" />
     <Compile Include="Powerups\Powerup.cs" />

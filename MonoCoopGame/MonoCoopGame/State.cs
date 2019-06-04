@@ -12,6 +12,8 @@ namespace monoCoopGame
         public static event GameQuitDelegate GameQuit;
         public static event StateChangedDelegate StateChanged;
 
+        public static List<IController> Controllers = new List<IController>();
+
         private static bool isFullScreen;
         private static State previousState;
         private static State currentState;

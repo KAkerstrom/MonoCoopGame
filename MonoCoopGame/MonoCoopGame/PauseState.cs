@@ -10,11 +10,11 @@ namespace monoCoopGame
     public class PauseState : State
     {
         private Menu menu;
-        private Controller controller;
+        private IController controller;
         private State gameState;
         private Texture2D background;
 
-        public PauseState(GraphicsDevice graphics, Controller controller, State gameState, Texture2D background) : base(graphics)
+        public PauseState(GraphicsDevice graphics, IController controller, State gameState, Texture2D background) : base(graphics)
         {
             this.gameState = gameState;
             this.controller = controller;
@@ -79,11 +79,11 @@ namespace monoCoopGame
                 else
                     menu.SetIndex(0);
             }
-            if (controller.State.ThumbSticks.Left.Y > 0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y <= 0.5f)
+            if (controller.LeftStick.Y > 0.5f
+                && controller.PreviousLeftStick.Y <= 0.5f)
                 menu.DecrementIndex(false);
-            if (controller.State.ThumbSticks.Left.Y < -0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y >= -0.5f)
+            if (controller.LeftStick.Y < -0.5f
+                && controller.PreviousLeftStick.Y >= -0.5f)
                 menu.IncrementIndex(false);
         }
     }

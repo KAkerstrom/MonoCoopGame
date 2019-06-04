@@ -9,11 +9,12 @@ namespace monoCoopGame
     public class TitleState : State
     {
         private Menu menu;
-        private Controller controller;
+        private List<IController> controllers;
         private CharacterSelectState selectState;
 
         public TitleState(GraphicsDevice graphics) : base(graphics)
         {
+            controllers = PlayerManager.GetConnectedControllers();
             TitleMenuItem playItem = new TitleMenuItem("Play");
             TitleMenuItem settingsItem = new TitleMenuItem("Settings");
             TitleMenuItem aboutItem = new TitleMenuItem("About");
@@ -41,6 +42,8 @@ namespace monoCoopGame
         private void PlayItem_MenuItemActivated(MenuItem item)
         {
             CurrentState = selectState;
+            foreach (IController controller in controllers)
+                controller.Update();
         }
 
         private void SettingsItem_MenuItemActivated(MenuItem item)
@@ -55,38 +58,32 @@ namespace monoCoopGame
 
         private void ExitItem_MenuItemActivated(MenuItem item)
         {
-            CurrentState = new ExitState(graphics, controller, this);
+            CurrentState = new ExitState(graphics, null, this);
         }
 
         public override void Draw()
         {
             graphics.Clear(new Color(99, 197, 207));
-
             spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, null);
-
             menu.Draw(spriteBatch);
-
             spriteBatch.End();
         }
 
         public override void Step()
         {
-            if (controller == null)
+            foreach (IController controller in controllers)
             {
-                for (int i = 0; i < GamePad.MaximumGamePadCount; i++)
-                    if (GamePad.GetState(i).IsConnected)
-                        controller = new Controller(i);
-                return;
+                controller.Update();
+                if (controller.ButtonPressed(Buttons.A)
+                    || controller.ButtonPressed(Buttons.Start))
+                    menu.ActivateItem();
+                if (controller.LeftStickMoved(Directions.North)
+                    || controller.ButtonPressed(Buttons.DPadUp))
+                    menu.DecrementIndex(false);
+                if (controller.LeftStickMoved(Directions.South)
+                    || controller.ButtonPressed(Buttons.DPadDown))
+                    menu.IncrementIndex(false);
             }
-            controller.Update();
-            if (controller.ButtonPressed(Buttons.A))
-                menu.ActivateItem();
-            if (controller.State.ThumbSticks.Left.Y > 0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y <= 0.5f)
-                menu.DecrementIndex(false);
-            if (controller.State.ThumbSticks.Left.Y < -0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y >= -0.5f)
-                menu.IncrementIndex(false);
         }
     }
 }

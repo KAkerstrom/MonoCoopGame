@@ -9,7 +9,7 @@ namespace monoCoopGame
     public class CharacterSelectState : State
     {
         private CharacterSelectMenu[] menus = new CharacterSelectMenu[4];
-        private List<Controller> controllers = new List<Controller>();
+        private List<IController> controllers;
         private PlayerManager playerManager;
         private GameState gameState;
         private int gameStartTimer = 0;
@@ -29,6 +29,7 @@ namespace monoCoopGame
                 menus[i] = new CharacterSelectMenu(i, bounds);
             }
 
+            controllers = PlayerManager.GetConnectedControllers();
             playerManager = new PlayerManager();
             playerManager.PlayerConnected += PlayerConnected;
 
@@ -36,9 +37,12 @@ namespace monoCoopGame
             gameState = new GameState(graphics, map, new List<Player>());
         }
 
-        private void PlayerConnected(int playerIndex)
+        private void PlayerConnected(IController controller)
         {
-            controllers.Add(new Controller(playerIndex));
+            foreach (IController c in controllers)
+                if (c.ControllerIndex == controller.ControllerIndex)
+                    return;
+            controllers.Add(controller);
         }
 
         private bool AllPlayersReady()
@@ -76,11 +80,11 @@ namespace monoCoopGame
                 CurrentState = gameState;
             }
 
-            foreach (Controller c in controllers)
+            foreach (IController c in controllers)
             {
                 bool unassigned = true;
                 foreach (CharacterSelectMenu menu in menus)
-                    if (menu.Active && menu.controllerIndex == c.PlayerIndex)
+                    if (menu.Active && menu.controllerIndex == c.ControllerIndex)
                         unassigned = false;
 
                 if (unassigned)
@@ -90,7 +94,7 @@ namespace monoCoopGame
                         for (int i = 0; i < 4; i++)
                             if (!menus[i].Active)
                             {
-                                menus[i].Activate(c.PlayerIndex);
+                                menus[i].Activate(c.ControllerIndex);
                                 break;
                             }
                 }

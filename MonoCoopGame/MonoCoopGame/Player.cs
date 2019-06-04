@@ -15,13 +15,13 @@ namespace monoCoopGame
         public Inventory Inventory;
         public int BombPower = 1;
         public int Speed = 2;
-        public Controller Controller { get; }
+        public IController Controller { get; }
 
         public Player(string playerName, int playerIndex, int controllerIndex, int characterIndex, Inventory playerInventory, int x, int y) : base(x, y, characterIndex)
         {
             PlayerIndex = playerIndex;
             Name = playerName;
-            Controller = new Controller(controllerIndex);
+            Controller = ControllerFactory.GetController(controllerIndex);
             SetDefaultButtonMap(); // Action.cs
             sprite = sprites["walk"][Directions.South];
             Reticle = new Reticle(this);
@@ -45,8 +45,8 @@ namespace monoCoopGame
                     buttonMap[button].Perform(gameState);
 
             currentMoveSpeed = Controller.ButtonDown(Buttons.A) ? moveSpeed * 1.5f : moveSpeed;
-            float xDelta = Controller.State.ThumbSticks.Left.X * currentMoveSpeed;
-            float yDelta = -Controller.State.ThumbSticks.Left.Y * currentMoveSpeed;
+            float xDelta = Controller.LeftStick.X * currentMoveSpeed;
+            float yDelta = -Controller.LeftStick.Y * currentMoveSpeed;
             if (!Controller.ButtonDown(Buttons.LeftTrigger))
                 FaceTowardDelta(xDelta, yDelta);
             Strafe(gameState, xDelta, yDelta);
@@ -69,7 +69,7 @@ namespace monoCoopGame
 
         protected override void BeginDraw(SpriteBatch spriteBatch)
         {
-            Reticle.Draw(spriteBatch, Controller.State.Triggers.Right);
+            Reticle.Draw(spriteBatch, Controller.RightTrigger);
         }
 
         protected override void EndDraw(SpriteBatch spriteBatch)

@@ -10,13 +10,16 @@ namespace monoCoopGame
     public class ExitState : State
     {
         private Menu menu;
-        private Controller controller;
+        private List<IController> controllers = new List<IController>();
         private State previousState;
 
-        public ExitState(GraphicsDevice graphics, Controller controller, State previousState) : base(graphics)
+        public ExitState(GraphicsDevice graphics, IController controller, State previousState) : base(graphics)
         {
             this.previousState = previousState;
-            this.controller = controller;
+            if (controller != null)
+                controllers.Add(controller);
+            else
+                controllers.AddRange(PlayerManager.GetConnectedControllers());
             TitleMenuItem ExitItem = new TitleMenuItem("Yes");
             TitleMenuItem CancelItem = new TitleMenuItem("No");
 
@@ -64,17 +67,21 @@ namespace monoCoopGame
 
         public override void Step()
         {
-            controller.Update();
-            if (controller.ButtonPressed(Buttons.A))
-                menu.ActivateItem();
-            if (controller.ButtonPressed(Buttons.B))
-                CancelItem_MenuItemActivated(null);
-            if (controller.State.ThumbSticks.Left.Y > 0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y <= 0.5f)
-                menu.DecrementIndex(false);
-            if (controller.State.ThumbSticks.Left.Y < -0.5f
-                && controller.PreviousState.ThumbSticks.Left.Y >= -0.5f)
-                menu.IncrementIndex(false);
+            foreach (IController controller in controllers)
+            {
+                controller.Update();
+                if (controller.ButtonPressed(Buttons.A)
+                    || controller.ButtonPressed(Buttons.Start))
+                    menu.ActivateItem();
+                if (controller.ButtonPressed(Buttons.B))
+                    CancelItem_MenuItemActivated(null);
+                if (controller.LeftStickMoved(Directions.North)
+                    || controller.ButtonPressed(Buttons.DPadUp))
+                    menu.DecrementIndex(false);
+                if (controller.LeftStickMoved(Directions.South)
+                    || controller.ButtonPressed(Buttons.DPadDown))
+                    menu.IncrementIndex(false);
+            }
         }
     }
 }

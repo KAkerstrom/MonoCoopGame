@@ -4,11 +4,20 @@ using System.Timers;
 
 namespace monoCoopGame
 {
-    public delegate void PlayerConnectedDelegate(int playerIndex);
-    public delegate void PlayerDisconnectedDelegate(int playerIndex);
+    public delegate void PlayerConnectedDelegate(IController controller);
+    public delegate void PlayerDisconnectedDelegate(int controllerIndex);
 
     public class PlayerManager
     {
+        public static List<IController> GetConnectedControllers()
+        {
+            List<IController> controllers = new List<IController> { new KeyboardController(-1) };
+            for (int i = 0; i < GamePad.MaximumGamePadCount; i++)
+                if (GamePad.GetState(i).IsConnected)
+                    controllers.Add(new GamepadController(i));
+            return controllers;
+        }
+
         public event PlayerConnectedDelegate PlayerConnected;
         public event PlayerDisconnectedDelegate PlayerDisconnected;
 
@@ -29,13 +38,19 @@ namespace monoCoopGame
 
         private void ControllerCheckTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            if (!players.Contains(-1))
+            {
+                players.Add(-1);
+                PlayerConnected?.Invoke(new KeyboardController(-1));
+            }
+
             for (int i = 0; i < GamePad.MaximumGamePadCount; i++)
                 if (GamePad.GetState(i).IsConnected)
                 {
                     if (!players.Contains(i))
                     {
                         players.Add(i);
-                        PlayerConnected?.Invoke(i);
+                        PlayerConnected?.Invoke(new GamepadController(i));
                     }
                 }
                 else if (players.Contains(i))

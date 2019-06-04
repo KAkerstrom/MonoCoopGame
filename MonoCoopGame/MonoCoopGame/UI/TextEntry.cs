@@ -9,6 +9,8 @@ namespace monoCoopGame.UI
 {
     class TextEntry
     {
+        private static bool KeyboardInputEnabled = true;
+
         public string Text { get { return new string(text).Trim(); } }
         public int MaxLength { get { return text.Length; } }
         public bool Active { get { return controller != null; } }
@@ -16,7 +18,7 @@ namespace monoCoopGame.UI
         private int repeatKeyTimer = 0;
         private const int repeatKeyTrigger = 10;
         private char[] text;
-        private Controller controller;
+        private IController controller;
         private Rectangle bounds;
         private int index = 0;
         private KeyboardState keyState;
@@ -30,8 +32,10 @@ namespace monoCoopGame.UI
                 text[i] = ' ';
         }
 
-        public void Activate(Controller controller)
+        public void Activate(IController controller)
         {
+            if (controller is KeyboardController)
+                KeyboardInputEnabled = false;
             this.controller = controller;
             keyState = Keyboard.GetState();
             controller.Update();
@@ -39,6 +43,8 @@ namespace monoCoopGame.UI
 
         public void Deactivate()
         {
+            if (controller is KeyboardController)
+                KeyboardInputEnabled = true;
             controller = null;
         }
 
@@ -66,38 +72,41 @@ namespace monoCoopGame.UI
         {
             if (Active)
             {
-                //Keyboard Input
-                Keys key = GetKeyboardInput();
-                switch (key)
-                {
-                    case Keys.Enter:
-                        Deactivate();
-                        break;
-                    case Keys.Back:
-                        if (index == 0)
-                        {
-                            Deactivate();
-                            return;
-                        }
-                        else
-                        {
-                            text[index] = ' ';
-                            if (index > 0)
-                                index--;
-                        }
-                        break;
-                    case 0: // Do nothing
-                        break;
-                    default: // Characters + space
-                        text[index] = (char)key;
-                        if (++index == MaxLength)
-                        {
-                            index--;
-                            Deactivate();
-                            return;
-                        }
-                        break;
-                }
+                //if (KeyboardInputEnabled || controller is KeyboardController)
+                //{
+                //    //Keyboard Input
+                //    Keys key = GetKeyboardInput();
+                //    switch (key)
+                //    {
+                //        case Keys.Enter:
+                //            Deactivate();
+                //            return;
+                //        case Keys.Back:
+                //            text[index] = ' ';
+                //            if (index == 0)
+                //            {
+                //                Deactivate();
+                //                return;
+                //            }
+                //            else
+                //            {
+                //                if (index > 0)
+                //                    index--;
+                //            }
+                //            break;
+                //        case 0: // Do nothing
+                //            break;
+                //        default: // Characters + space
+                //            text[index] = (char)key;
+                //            if (++index == MaxLength)
+                //            {
+                //                index--;
+                //                Deactivate();
+                //                return;
+                //            }
+                //            break;
+                //    }
+                //}
 
                 // Controller Input
                 if (controller.ButtonPressed(Buttons.A)
@@ -109,8 +118,8 @@ namespace monoCoopGame.UI
 
                 if (controller.ButtonUp(Buttons.DPadDown)
                     && controller.ButtonUp(Buttons.DPadUp)
-                    && controller.State.ThumbSticks.Left.Y <= 0.5
-                    && controller.State.ThumbSticks.Left.Y >= -0.5)
+                    && controller.LeftStick.Y <= 0.5
+                    && controller.LeftStick.Y >= -0.5)
                     repeatKeyTimer = 0;
                 else
                     repeatKeyTimer++;
@@ -120,7 +129,7 @@ namespace monoCoopGame.UI
                     if (repeatKeyTimer == repeatKeyTrigger)
                         repeatKeyTimer = 0;
 
-                    if (controller.State.ThumbSticks.Left.Y < -0.5
+                    if (controller.LeftStick.Y < -0.5
                         || controller.ButtonDown(Buttons.DPadDown))
                     {
                         if (text[index] > (char)Keys.A)
@@ -128,7 +137,7 @@ namespace monoCoopGame.UI
                         else if (text[index] == (char)Keys.A)
                             text[index] = ' ';
                     }
-                    else if (controller.State.ThumbSticks.Left.Y > 0.5
+                    else if (controller.LeftStick.Y > 0.5
                         || controller.ButtonDown(Buttons.DPadUp))
                     {
                         if (text[index] < (char)Keys.Z)
@@ -141,15 +150,15 @@ namespace monoCoopGame.UI
                     }
                 }
 
-                if ((controller.State.ThumbSticks.Left.X > 0.5
-                    && controller.PreviousState.ThumbSticks.Left.X <= 0.5)
+                if ((controller.LeftStick.X > 0.5
+                    && controller.PreviousLeftStick.X <= 0.5)
                     || controller.ButtonPressed(Buttons.DPadRight))
                 {
                     if (index < MaxLength - 1)
                         index++;
                 }
-                else if ((controller.State.ThumbSticks.Left.X < -0.5
-                    && controller.PreviousState.ThumbSticks.Left.X >= -0.5)
+                else if ((controller.LeftStick.X < -0.5
+                    && controller.PreviousLeftStick.X >= -0.5)
                     || controller.ButtonPressed(Buttons.DPadLeft))
                 {
                     if (index > 0)
