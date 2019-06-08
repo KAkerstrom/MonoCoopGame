@@ -47,6 +47,10 @@ namespace monoCoopGame
             currentMoveSpeed = Controller.ButtonDown(Buttons.A) ? moveSpeed * 1.5f : moveSpeed;
             float xDelta = Controller.LeftStick.X * currentMoveSpeed;
             float yDelta = -Controller.LeftStick.Y * currentMoveSpeed;
+            if (Controller.ButtonDown(Buttons.DPadUp)) yDelta = -currentMoveSpeed;
+            if (Controller.ButtonDown(Buttons.DPadDown)) yDelta = currentMoveSpeed;
+            if (Controller.ButtonDown(Buttons.DPadLeft)) xDelta = -currentMoveSpeed;
+            if (Controller.ButtonDown(Buttons.DPadRight)) xDelta = currentMoveSpeed;
             if (!Controller.ButtonDown(Buttons.LeftTrigger))
                 FaceTowardDelta(xDelta, yDelta);
             Strafe(gameState, xDelta, yDelta);

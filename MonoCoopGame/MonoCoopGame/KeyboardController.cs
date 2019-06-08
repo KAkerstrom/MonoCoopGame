@@ -25,6 +25,8 @@ namespace monoCoopGame
                 { Buttons.RightShoulder, Keys.S },
                 { Buttons.Back, Keys.Back },
                 { Buttons.Start, Keys.Enter },
+                { Buttons.LeftTrigger, Keys.Q },
+                { Buttons.RightTrigger, Keys.W },
             });
         }
         public int ControllerIndex { get; }
