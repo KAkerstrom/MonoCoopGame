@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using monoCoopGame.InventoryItems;
 using monoCoopGame.Tiles;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace monoCoopGame.UI
     class CharacterSelectMenu
     {
         public enum MenuStates { PressStart, Selection, Ready }
-        private enum SubMenuItems { Character, Name, Buy, Sell, Ready }
+        private enum SubMenuItems { Character, Name, Buy, Ready }
 
         public int controllerIndex { get; private set; }
         public MenuStates State = MenuStates.PressStart;
@@ -42,6 +43,22 @@ namespace monoCoopGame.UI
                 Tile.TILE_SIZE * 2
             );
             nameEntry = new TextEntry(6, nameBounds);
+            buyInventory.ShowQuantity = false;
+            buyInventory = new Inventory
+            (
+                new List<InventoryItem>
+                {
+                    new BombItem(1),
+                    new BushItem(1),
+                    new WallItem(1),
+                    new SlimeItem(1),
+                    new PushBlockItem(1),
+                    new BulletItem(1),
+                    new DoorItem(1),
+                    new ShovelItem(1),
+                    new MineItem(1),
+                }
+            );
         }
 
         public Player CreatePlayer()
@@ -154,17 +171,17 @@ namespace monoCoopGame.UI
                         || (controller.LeftStick.X < -0.2
                             && controller.PreviousLeftStick.X >= -0.2))
                             buyInventory.DecrementIndex();
-                        break;
-
-                    case SubMenuItems.Sell:
-                        if (controller.ButtonPressed(Buttons.DPadRight)
-                        || (controller.LeftStick.X > 0.2
-                            && controller.PreviousLeftStick.X <= 0.2))
-                            sellInventory.IncrementIndex();
-                        else if (controller.ButtonPressed(Buttons.DPadLeft)
-                        || (controller.LeftStick.X < -0.2
-                            && controller.PreviousLeftStick.X >= -0.2))
-                            sellInventory.DecrementIndex();
+                        else if (controller.ButtonPressed(Buttons.A))
+                        {
+                            InventoryItem item = buyInventory.GetCurrentItem().Copy();
+                            item.Quantity = 1;
+                            sellInventory.AddItem(item);
+                        }
+                        else if (controller.ButtonPressed(Buttons.B))
+                        {
+                            if (sellInventory.GetItem(buyInventory.GetCurrentItem().Name) != null)
+                                sellInventory.DepleteItem(buyInventory.GetCurrentItem().Name, 1);
+                        }
                         break;
 
                     case SubMenuItems.Ready:
@@ -245,16 +262,12 @@ namespace monoCoopGame.UI
             spriteBatch.Draw(Sprite.GetTexture(currentItem == SubMenuItems.Buy ? "reticle" : "powerup2"), drawBounds, Color.White);
             buyInventory.Draw(spriteBatch, drawBounds);
 
-            // Draw Sell Inventory
-            drawBounds = new Rectangle
-            (
-                Bounds.X + Tile.TILE_SIZE * 4,
-                Bounds.Y + Tile.TILE_SIZE * 6,
-                Bounds.Width - Tile.TILE_SIZE * 5,
-                Tile.TILE_SIZE
-            );
-            spriteBatch.Draw(Sprite.GetTexture(currentItem == SubMenuItems.Sell ? "reticle" : "powerup2"), drawBounds, Color.White);
-            sellInventory.Draw(spriteBatch, drawBounds);
+            int currentQuantityOwned = 0;
+            InventoryItem item = sellInventory.GetItem(buyInventory.GetCurrentItem().Name);
+            if (item != null)
+                currentQuantityOwned = item.Quantity;
+            Vector2 drawPoint = new Vector2(Bounds.X + Tile.TILE_SIZE * 4, Bounds.Y + Tile.TILE_SIZE * 6);
+            spriteBatch.DrawString(Utility.Fonts["blocks"], currentQuantityOwned.ToString(), drawPoint, Color.Black);
 
             // Draw Ready button
             drawBounds = new Rectangle

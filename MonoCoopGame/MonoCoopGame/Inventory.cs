@@ -10,23 +10,19 @@ namespace monoCoopGame
 {
     public partial class Inventory
     {
+        public bool ShowQuantity { get; set; } = true;
+
         private int index = 0;
         private List<InventoryItem> inventory;
 
         public Inventory()
         {
-            inventory = new List<InventoryItem>
-            {
-                new BombItem(9999),
-                new BushItem(9999),
-                new WallItem(9999),
-                new SlimeItem(9999),
-                new PushBlockItem(9999),
-                new BulletItem(9999),
-                new DoorItem(9999),
-                new ShovelItem(9999),
-                new MineItem(9999),
-            };
+            inventory = new List<InventoryItem>();
+        }
+
+        public Inventory(List<InventoryItem> items)
+        {
+            inventory = items;
         }
 
         public void AddItem(InventoryItem item)
@@ -82,6 +78,19 @@ namespace monoCoopGame
                 index = inventory.Count - 1;
         }
 
+        public void ChangeIndexToItem(string itemName)
+        {
+            InventoryItem item = inventory.Find(x => x.Name == itemName);
+            if (item != null)
+                while (GetCurrentItem().Name != itemName)
+                    IncrementIndex();
+        }
+
+        public InventoryItem GetItem(string itemName)
+        {
+            return inventory.Find(x => x.Name == itemName);
+        }
+
         public InventoryItem GetCurrentItem()
         {
             if (inventory.Count > 0)
@@ -93,30 +102,31 @@ namespace monoCoopGame
         {
             int width = drawArea.Width / 5;
             int height = drawArea.Height;
-            for (int i = 2; i >= 0; i--)
-                for (int j = -1; j <= 1; j += 2)
-                {
-                    int itemIndex = (index + (i * j)) % (inventory.Count);
-                    if (itemIndex < 0)
-                        itemIndex = inventory.Count + itemIndex;
-
-                    Rectangle itemRect = new Rectangle(drawArea.X + (i * j + 2) * width, drawArea.Y, width, height);
-
-                    if (i == 0)
+            if (inventory.Count > 0)
+                for (int i = 2; i >= 0; i--)
+                    for (int j = -1; j <= 1; j += 2)
                     {
-                        int wider = (int)(width * 0.2);
-                        int taller = (int)(height * 0.2);
-                        itemRect = new Rectangle(itemRect.X - wider, itemRect.Y - taller, itemRect.Width + wider * 2, itemRect.Height + taller * 2);
-                    }
+                        int itemIndex = (index + (i * j)) % (inventory.Count);
+                        if (itemIndex < 0)
+                            itemIndex = inventory.Count + itemIndex;
 
-                    spriteBatch.Draw(inventory[itemIndex].Texture, itemRect, Color.White * (1f / (i + 1)));
+                        Rectangle itemRect = new Rectangle(drawArea.X + (i * j + 2) * width, drawArea.Y, width, height);
 
-                    if (i == 0)
-                    {
-                        Vector2 drawPoint = new Vector2(itemRect.Location.X, itemRect.Bottom - 10);
-                        spriteBatch.DrawString(Utility.Fonts["quantityFont"], inventory[itemIndex].Quantity.ToString(), drawPoint, Color.Black);
+                        if (i == 0)
+                        {
+                            int wider = (int)(width * 0.2);
+                            int taller = (int)(height * 0.2);
+                            itemRect = new Rectangle(itemRect.X - wider, itemRect.Y - taller, itemRect.Width + wider * 2, itemRect.Height + taller * 2);
+                        }
+
+                        spriteBatch.Draw(inventory[itemIndex].Texture, itemRect, Color.White * (1f / (i + 1)));
+
+                        if (ShowQuantity && i == 0)
+                        {
+                            Vector2 drawPoint = new Vector2(itemRect.Location.X, itemRect.Bottom - 10);
+                            spriteBatch.DrawString(Utility.Fonts["quantityFont"], inventory[itemIndex].Quantity.ToString(), drawPoint, Color.Black);
+                        }
                     }
-                }
         }
     }
 }

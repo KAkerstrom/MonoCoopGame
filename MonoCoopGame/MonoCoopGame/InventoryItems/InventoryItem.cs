@@ -17,6 +17,11 @@ namespace monoCoopGame.InventoryItems
             Quantity = quantity;
         }
 
+        public InventoryItem Copy()
+        {
+            return (InventoryItem)MemberwiseClone();
+        }
+
         public abstract void Use(GameState gameState, Player player);
     }
 }
