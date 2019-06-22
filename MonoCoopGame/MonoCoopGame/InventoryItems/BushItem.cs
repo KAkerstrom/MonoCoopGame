@@ -4,7 +4,14 @@ namespace monoCoopGame.InventoryItems
 {
     public class BushItem : InventoryItem
     {
-        public BushItem(int quantity) : base("Bush", "bush", quantity) { }
+        public BushItem(int quantity) : base
+            (
+            "Bush", 
+            "bush", 
+            quantity, 
+            1,
+            "A cheap, weak fortification."
+            ) { }
 
         public override void Use(GameState gameState, Player player)
         {

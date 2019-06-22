@@ -15,9 +15,10 @@ namespace monoCoopGame
         public Inventory Inventory;
         public int BombPower = 1;
         public int Speed = 2;
+        public int Wealth { get; set; }
         public IController Controller { get; }
 
-        public Player(string playerName, int playerIndex, int controllerIndex, int characterIndex, Inventory playerInventory, int x, int y) : base(x, y, characterIndex)
+        public Player(string playerName, int playerIndex, int controllerIndex, int characterIndex, Inventory playerInventory, int x, int y, int wealth) : base(x, y, characterIndex)
         {
             PlayerIndex = playerIndex;
             Name = playerName;
@@ -27,6 +28,7 @@ namespace monoCoopGame
             Reticle = new Reticle(this);
             Inventory = playerInventory;
             gui = new PlayerGUI(this);
+            Wealth = wealth;
         }
 
         /// <summary>

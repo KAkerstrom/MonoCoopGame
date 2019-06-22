@@ -5,7 +5,14 @@ namespace monoCoopGame.InventoryItems
 {
     public class BulletItem : InventoryItem
     {
-        public BulletItem(int quantity) : base("Bullet", "bullet", quantity) { }
+        public BulletItem(int quantity) : base
+            (
+            "Bullet", 
+            "bullet", 
+            quantity, 
+            1,
+            "A basic bullet."
+            ) { }
 
         public override void Use(GameState gameState, Player player)
         {

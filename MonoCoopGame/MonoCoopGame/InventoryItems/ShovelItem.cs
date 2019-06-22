@@ -5,7 +5,14 @@ namespace monoCoopGame.InventoryItems
 {
     public class ShovelItem : InventoryItem
     {
-        public ShovelItem(int quantity) : base("Shovel", "shovel", quantity) { }
+        public ShovelItem(int quantity) : base
+            (
+            "Shovel", 
+            "shovel", 
+            quantity, 
+            1,
+            "Digs a hole that can also be flooded with water."
+            ) { }
 
         public override void Use(GameState gameState, Player player)
         {

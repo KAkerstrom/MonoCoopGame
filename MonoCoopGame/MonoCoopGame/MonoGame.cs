@@ -49,6 +49,7 @@ namespace monoCoopGame
             Sprite.LoadSprites(Content, "img");
             Utility.Fonts.Add("playerGUI", Content.Load<SpriteFont>("playerGUI"));
             Utility.Fonts.Add("blocks", Content.Load<SpriteFont>("Fonts/blocks"));
+            Utility.Fonts.Add("blocks_small", Content.Load<SpriteFont>("Fonts/blocks_small"));
             Utility.Fonts.Add("quantityFont", Content.Load<SpriteFont>("Fonts/quantityFont"));
 
             state = new TitleState(GraphicsDevice);

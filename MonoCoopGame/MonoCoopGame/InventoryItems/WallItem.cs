@@ -5,7 +5,14 @@ namespace monoCoopGame.InventoryItems
 {
     public class WallItem : InventoryItem
     {
-        public WallItem(int quantity) : base("Wall", "wallStone", quantity) { }
+        public WallItem(int quantity) : base
+            (
+            "Wall", 
+            "wallStone", 
+            quantity, 
+            5,
+            "A strong fortification."
+            ) { }
 
         public override void Use(GameState gameState, Player player)
         {

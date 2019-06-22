@@ -28,6 +28,7 @@ namespace monoCoopGame.UI
         private Inventory sellInventory = new Inventory();
         private TextEntry nameEntry;
         private SubMenuItems currentItem = SubMenuItems.Character;
+        private int wealth = 100; // Should tie this to the player rather than just setting it here
 
         private IController controller;
 
@@ -43,7 +44,6 @@ namespace monoCoopGame.UI
                 Tile.TILE_SIZE * 2
             );
             nameEntry = new TextEntry(6, nameBounds);
-            buyInventory.ShowQuantity = false;
             buyInventory = new Inventory
             (
                 new List<InventoryItem>
@@ -59,6 +59,7 @@ namespace monoCoopGame.UI
                     new MineItem(1),
                 }
             );
+            buyInventory.ShowQuantity = false;
         }
 
         public Player CreatePlayer()
@@ -71,7 +72,8 @@ namespace monoCoopGame.UI
                     character,
                     sellInventory,
                     20 * Tile.TILE_SIZE,
-                    12 * Tile.TILE_SIZE
+                    12 * Tile.TILE_SIZE,
+                    wealth
                 );
         }
 
@@ -90,6 +92,7 @@ namespace monoCoopGame.UI
             controller = null;
             buyInventory = new Inventory();
             sellInventory = new Inventory();
+            wealth = 100;
         }
 
         public void Step()
@@ -174,13 +177,21 @@ namespace monoCoopGame.UI
                         else if (controller.ButtonPressed(Buttons.A))
                         {
                             InventoryItem item = buyInventory.GetCurrentItem().Copy();
-                            item.Quantity = 1;
-                            sellInventory.AddItem(item);
+                            if (wealth >= item.Value)
+                            {
+                                wealth -= item.Value;
+                                item.Quantity = 1;
+                                sellInventory.AddItem(item);
+                            }
                         }
                         else if (controller.ButtonPressed(Buttons.B))
                         {
                             if (sellInventory.GetItem(buyInventory.GetCurrentItem().Name) != null)
-                                sellInventory.DepleteItem(buyInventory.GetCurrentItem().Name, 1);
+                            {
+                                InventoryItem item = buyInventory.GetCurrentItem();
+                                wealth += item.Value;
+                                sellInventory.DepleteItem(item.Name, 1);
+                            }
                         }
                         break;
 
@@ -190,13 +201,13 @@ namespace monoCoopGame.UI
                         break;
                 }
 
-                if (controller.ButtonPressed(Buttons.B))
-                {
-                    if (currentItem == SubMenuItems.Character)
-                        Deactivate();
-                    else
-                        currentItem = SubMenuItems.Character;
-                }
+                //if (controller.ButtonPressed(Buttons.B))
+                //{
+                //    if (currentItem == SubMenuItems.Character)
+                //        Deactivate();
+                //    else
+                //        currentItem = SubMenuItems.Character;
+                //}
             }
 
             nameEntry.Step();
@@ -248,6 +259,9 @@ namespace monoCoopGame.UI
             spriteBatch.Draw(Sprite.GetTexture(currentItem == SubMenuItems.Character ? "reticle" : "powerup2"), drawBounds, Color.White);
             spriteBatch.Draw(Sprite.GetTexture($"char{character}_walk_s_1"), drawBounds, Color.White);
 
+            Vector2 wealthPoint = new Vector2(drawBounds.Center.X - (Utility.Fonts["blocks_small"].MeasureString($"${wealth}").X / 2), Bounds.Y + Tile.TILE_SIZE * 3);
+            spriteBatch.DrawString(Utility.Fonts["blocks_small"], $"${wealth}", wealthPoint, Color.Black);
+
             // Draw Name
             nameEntry.Draw(spriteBatch);
 
@@ -263,11 +277,13 @@ namespace monoCoopGame.UI
             buyInventory.Draw(spriteBatch, drawBounds);
 
             int currentQuantityOwned = 0;
-            InventoryItem item = sellInventory.GetItem(buyInventory.GetCurrentItem().Name);
-            if (item != null)
-                currentQuantityOwned = item.Quantity;
-            Vector2 drawPoint = new Vector2(Bounds.X + Tile.TILE_SIZE * 4, Bounds.Y + Tile.TILE_SIZE * 6);
-            spriteBatch.DrawString(Utility.Fonts["blocks"], currentQuantityOwned.ToString(), drawPoint, Color.Black);
+            InventoryItem shopItem = buyInventory.GetCurrentItem();
+            InventoryItem invItem = sellInventory.GetItem(shopItem.Name);
+            if (invItem != null)
+                currentQuantityOwned = invItem.Quantity;
+            string costOwned = $"Cost: ${shopItem.Value}\nOwned: {currentQuantityOwned}";
+            Vector2 drawPoint = new Vector2(drawBounds.Center.X - (Utility.Fonts["blocks_small"].MeasureString(costOwned).X / 2), Bounds.Y + Tile.TILE_SIZE * 5);
+            spriteBatch.DrawString(Utility.Fonts["blocks_small"], costOwned, drawPoint, Color.Black);
 
             // Draw Ready button
             drawBounds = new Rectangle

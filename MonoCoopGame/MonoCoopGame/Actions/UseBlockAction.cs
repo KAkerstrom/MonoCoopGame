@@ -13,8 +13,11 @@ namespace monoCoopGame
             public override void Perform(GameState gameState)
             {
                 InventoryItem item = parent.Inventory.GetCurrentItem();
-                parent.Inventory.DepleteItem(item.Name, 1);
-                item.Use(gameState, parent);
+                if (item != null)
+                {
+                    parent.Inventory.DepleteItem(item.Name, 1);
+                    item.Use(gameState, parent);
+                }
             }
         }
     }
