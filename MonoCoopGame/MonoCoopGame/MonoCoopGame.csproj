@@ -94,7 +94,7 @@
     <Compile Include="GUI.cs" />
     <Compile Include="TileMap.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="PlayerGUI.cs" />
+    <Compile Include="UI\PlayerGUI.cs" />
     <Compile Include="PlayerManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,10 +8,25 @@ namespace monoCoopGame
 {
     public abstract class Character
     {
-        public int Health { get; set; }
+        public int MaxHealth { get; set; }
+        public int Health
+        {
+            get => health;
+            set
+            {
+                if (value < 0)
+                    health = 0;
+                else if (value > MaxHealth)
+                    value = MaxHealth;
+                else
+                    health = value;
+            }
+        }
         public Directions Facing;
         public Point Pos { get { return new Point((int)x, (int)y); } }
         public Point PreviousPos { get { return new Point((int)xPrevious, (int)yPrevious); } }
+
+        private int health;
         public Point PreviousGridPos
         {
             get { return new Point(PreviousHitbox.Center.X / Tile.TILE_SIZE, PreviousHitbox.Center.Y / Tile.TILE_SIZE); }
@@ -47,7 +62,7 @@ namespace monoCoopGame
             this.y = yPrevious = y;
             Facing = Directions.South;
             action = "walk";
-            Health = 50;
+            MaxHealth = health = 50;
             PopulateTextures(characterIndex);
             CharacterIndex = characterIndex;
         }

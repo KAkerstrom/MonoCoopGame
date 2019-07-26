@@ -19,10 +19,17 @@ namespace monoCoopGame
         public override void Draw(SpriteBatch spriteBatch)
         {
             DrawBackground(spriteBatch);
-            player.Inventory.Draw(spriteBatch, new Rectangle(drawArea.X + 16, drawArea.Y + 48, 32 * 5, 32));
-            spriteBatch.DrawString(Utility.Fonts["playerGUI"], $"{player.Name} ({player.Health})", new Vector2(drawArea.X + 64, drawArea.Y + 16), Color.Black);
-            Rectangle playerSpriteRect = new Rectangle(drawArea.X + 16, drawArea.Y + 8, 16 * 2, 16 * 2);
-            spriteBatch.Draw(Sprite.GetTexture("char" + player.CharacterIndex + "_walk_s_0"), playerSpriteRect, Color.White);
+            player.Inventory.Draw(spriteBatch, new Rectangle(drawArea.X + Tile.TILE_SIZE * 2, drawArea.Y + 48, 32 * 5, 32));
+            spriteBatch.DrawString(Utility.Fonts["playerGUI"], $"{player.Name} ({player.Health})", new Vector2(drawArea.X + Tile.TILE_SIZE * 3, drawArea.Y + 16), Color.Black);
+            Rectangle drawRect = new Rectangle(drawArea.X + Tile.TILE_SIZE * 2, drawArea.Y + 8, 16 * 2, 16 * 2);
+            spriteBatch.Draw(Sprite.GetTexture("char" + player.CharacterIndex + "_walk_s_0"), drawRect, Color.White);
+            // Draw Healthbar
+            drawRect = new Rectangle(drawArea.X + 16, drawArea.Y + 16, Tile.TILE_SIZE, Tile.TILE_SIZE * 2);
+            spriteBatch.Draw(Sprite.GetTexture("healthbar_red"), drawRect, Color.White);
+            int newHeight = drawRect.Height * (player.Health / player.MaxHealth);
+            drawRect.Y -= drawRect.Height - newHeight;
+            drawRect.Height = newHeight;
+            spriteBatch.Draw(Sprite.GetTexture("healthbar_green"), drawRect, Color.White);
         }
 
         private void DrawBackground(SpriteBatch spriteBatch)

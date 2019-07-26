@@ -9,7 +9,7 @@ namespace monoCoopGame.UI
 {
     class TextEntry
     {
-        private static bool KeyboardInputEnabled = true;
+        //private static bool KeyboardInputEnabled = true;
 
         public string Text { get { return new string(text).Trim(); } }
         public int MaxLength { get { return text.Length; } }
